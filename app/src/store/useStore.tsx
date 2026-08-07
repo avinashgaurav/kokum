@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { CookLogEntry, Household, PantryItem, Recipe } from '../engine/types';
+import type { CookLogEntry, Household, Leftover, PantryItem, Recipe } from '../engine/types';
 import { INGREDIENT_INDEX } from '../data/ingredients';
 import { applyCook, confirmItem, restock } from '../engine/cook';
 
@@ -11,6 +11,7 @@ export interface AppState {
   household: Household;
   pantry: Map<string, PantryItem>;
   cookLog: CookLogEntry[];
+  leftovers: Leftover[];
   /** False until the first load from disk completes, so we never flash seed data. */
   hydrated: boolean;
 }
@@ -26,6 +27,7 @@ export const DEFAULT_HOUSEHOLD: Household = {
   equipment: ['cooker', 'kadhai', 'tawa', 'mixer'],
   maxMinutesWeekday: 45,
   maxMinutesWeekend: 90,
+  observances: [],
 };
 
 /**
@@ -85,7 +87,11 @@ type Action =
   | { type: 'cook'; recipe: Recipe; now: number }
   | { type: 'confirm'; ingredientId: string; quantity: number; now: number }
   | { type: 'restock'; lines: Parameters<typeof restock>[1]; now: number }
-  | { type: 'household'; patch: Partial<Household> };
+  | { type: 'household'; patch: Partial<Household> }
+  | { type: 'add-leftover'; label: string; recipeId: string | null; portions: number; now: number }
+  | { type: 'eat-leftover'; id: string }
+  | { type: 'bin-leftover'; id: string }
+  | { type: 'merge-pantry'; pantry: Map<string, PantryItem> };
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -116,6 +122,39 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'household':
       return { ...state, household: { ...state.household, ...action.patch } };
+
+    case 'add-leftover':
+      return {
+        ...state,
+        leftovers: [
+          ...state.leftovers,
+          {
+            // Date.now plus a counter, not a random id: no crypto dependency, and stable
+            // enough for a list that never syncs by id.
+            id: `lo-${action.now}-${state.leftovers.length}`,
+            recipeId: action.recipeId,
+            label: action.label,
+            portions: action.portions,
+            createdAt: action.now,
+            // Cooked food keeps about two days refrigerated.
+            expiresAt: action.now + 2 * 86_400_000,
+          },
+        ],
+      };
+
+    case 'eat-leftover':
+      return {
+        ...state,
+        leftovers: state.leftovers.map((l) =>
+          l.id === action.id ? { ...l, portions: Math.max(0, l.portions - 1) } : l,
+        ),
+      };
+
+    case 'bin-leftover':
+      return { ...state, leftovers: state.leftovers.filter((l) => l.id !== action.id) };
+
+    case 'merge-pantry':
+      return { ...state, pantry: action.pantry };
   }
 }
 
@@ -129,6 +168,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     household: DEFAULT_HOUSEHOLD,
     pantry: new Map<string, PantryItem>(),
     cookLog: [],
+    leftovers: [],
     hydrated: false,
   }));
 
@@ -145,6 +185,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             household: Household;
             pantry: PantryItem[];
             cookLog: CookLogEntry[];
+            leftovers?: Leftover[];
           };
           dispatch({
             type: 'hydrate',
@@ -152,6 +193,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               household: { ...DEFAULT_HOUSEHOLD, ...parsed.household },
               pantry: new Map(parsed.pantry.map((p) => [p.ingredientId, p])),
               cookLog: parsed.cookLog ?? [],
+              leftovers: parsed.leftovers ?? [],
             },
           });
           return;
@@ -162,7 +204,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (!cancelled) {
         dispatch({
           type: 'hydrate',
-          state: { household: DEFAULT_HOUSEHOLD, pantry: seedPantry(now), cookLog: [] },
+          state: {
+            household: DEFAULT_HOUSEHOLD,
+            pantry: seedPantry(now),
+            cookLog: [],
+            leftovers: [],
+          },
         });
       }
     })();
@@ -178,6 +225,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       household: state.household,
       pantry: [...state.pantry.values()],
       cookLog: state.cookLog.slice(-500),
+      // Drop leftovers that expired more than a week ago; they are only noise by then.
+      leftovers: state.leftovers.filter((l) => l.expiresAt > Date.now() - 7 * 86_400_000),
     });
     AsyncStorage.setItem(KEY, payload).catch(() => {
       // Persistence failure must never take the app down; the session still works in memory.

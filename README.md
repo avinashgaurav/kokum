@@ -20,6 +20,10 @@ npm install
 npm start          # then scan the QR with Expo Go
 ```
 
+Optional: paste a Claude API key in Setup to turn on photo and voice capture. Optional: add
+Supabase credentials to `.env` (see `.env.example`) to share a pantry across phones. Neither
+is needed for the app to work.
+
 ## Verify before claiming anything works
 
 ```bash
@@ -28,7 +32,7 @@ npm run verify     # tsc --noEmit, then the engine test suite
 npx expo export --platform android --output-dir dist && rm -rf dist
 ```
 
-Current status: typecheck clean, 27 of 27 engine tests passing, Metro bundles 947 modules.
+Current status: typecheck clean, **48 of 48 engine tests passing**, Metro bundles 1135 modules.
 
 ## The one rule
 
@@ -45,8 +49,8 @@ App-initiated suggestions (Today, Surprise Me) show only *Cook now*, because an 
 suggestion you cannot act on is noise. When **you** ask (mood, cuisine, "I want biryani"),
 everything shows, honestly labelled, with two exits: order the missing items, or order the dish.
 
-Hard constraints (diet, allergies, equipment, cooktop) apply to both. A search may surface a
-dish you lack ingredients for. It may never surface one you must not eat.
+Hard constraints (diet, allergies, equipment, cooktop, fasting observances) apply to both. A
+search may surface a dish you lack ingredients for. It may never surface one you must not eat.
 
 Full rules in [AGENTS.md](AGENTS.md). Decisions and their reasoning in [DECISIONS.md](DECISIONS.md).
 
@@ -62,28 +66,55 @@ Four depletion mechanisms feed one confidence score, in `app/src/engine/confiden
    learned daily rate scaled to household size.
 4. **Manual correction.** Swipes and the weekly 30-second check, both of which reset confidence.
 
+Detail in [INVENTORY.md](INVENTORY.md).
+
+## Getting groceries in
+
+One parser, four sources, because a bill, a handwritten list, a shelf photo and a spoken list
+are the same extraction problem in different clothes:
+
+| Source | Accuracy |
+|---|---|
+| **Photo of the bill** | Best. Exact items, quantities and prices. |
+| **Photo of a list** | Good. Any script, but quantities are often missing. |
+| **Photo of the shelf** | Fair. What is visible, never how much. Capped at 0.6 confidence. |
+| **Voice** | Good. Uses your keyboard's own microphone, so Hinglish works as well as your phone does. |
+
+Every path lands on a confirmation screen with editable quantity steppers. Nothing reaches the
+pantry unreviewed. Detail in [AI-ENGINE.md](AI-ENGINE.md).
+
 ## Layout
 
 ```
 Guess/
   AGENTS.md            rules for anyone, human or model, changing this
   DECISIONS.md         every locked decision with its reasoning
+  INVENTORY.md         the depletion and confidence model
+  AI-ENGINE.md         deterministic layer, Claude layer, and the boundary between them
+  INTEGRATIONS.md      what is actually possible with Zepto, Blinkit, Swiggy and Zomato
+  DATA-MODEL.md        local store, Supabase schema, sync rules, privacy
+  supabase/migrations/ schema with row-level security, plus generated seed data
   app/
     src/
-      engine/          the deterministic core. No React, no I/O, fully testable.
+      engine/          deterministic core. No React, no I/O, fully testable.
         dishState.ts     the sacred function
         confidence.ts    depletion and confidence
         scaling.ts       household scaling. A bug here corrupts everything.
         suggest.ts       hard constraints, push/pull gate, scoring
         cook.ts          the four depletion events
-        __tests__/       27 golden-set invariant tests
-      data/            canonical ingredient dictionary (38), recipe corpus (14, all verified)
-      screens/         Today, Pantry, Order, Setup
+        plan.ts          weekly plan, leftovers, guest mode
+        insights.ts      nutrition, spend and waste for the week
+        __tests__/       48 invariant tests
+      ai/              Claude: parsing, reranking, mood interpretation
+      db/              Supabase client and pantry sync
+      data/            ingredient dictionary (37), recipe corpus (14, all verified)
+      screens/         Today, Week, Pantry, Capture, Order, Setup
       components/      the mark, shared UI
       integrations/    deep-link order handoff
       theme/           design tokens
     scripts/
-      build-icons.mjs  generates every icon size from one vector source
+      build-icons.mjs  every icon size from one vector source
+      gen-seed.ts      projects the TS dictionary into seed SQL
 ```
 
 ## Design
@@ -97,12 +128,17 @@ for. `npm run icons` regenerates every size from the vector.
 
 ## Known gaps
 
-- **Persistence is AsyncStorage, not SQLite.** The repository shape is right, but swap in
-  `expo-sqlite` before the pantry gets large.
-- **Ingestion is not built.** Photo and voice capture of grocery lists is the biggest missing
-  feature; today you correct the pantry by hand.
-- **Deep-link URLs are unverified.** Every scheme in `integrations/order.ts` carries a
-  `[VERIFY]` note. Test on a real handset before shipping.
-- **The recipe corpus is 14 dishes.** Enough to prove the engine, nowhere near enough to use.
-- **The icon may read as a spinner.** Open question Q-01 in DECISIONS.md. Three segments
-  instead of six is the leading fix, and `Mark.tsx` takes it as a parameter.
+- **Nothing has been tested on a physical device.** The deep-link URL schemes in
+  `integrations/order.ts` all carry `[VERIFY]` and have never been tapped on a real handset.
+- **The Supabase migration has never been applied to a live project.** The RLS policies are
+  written and reviewed, and unverified in practice.
+- **Persistence is AsyncStorage, not SQLite.** Fine at 40 pantry rows, wrong at 400.
+- **The recipe corpus is 14 dishes.** Enough to prove the engine, nowhere near enough to use
+  daily. Getting to ~500 without flipping `verified` in bulk is the next real milestone.
+- **Par levels and burn rates do not learn.** They are static defaults scaled by household size.
+- **No home-screen widget.** WidgetKit and Glance need native code and cannot run in Expo Go,
+  so this needs a development build before it can even be attempted.
+- **Leftovers, meal plans and captures do not sync.** The tables exist; the sync does not touch
+  them yet.
+- **The icon may read as a spinner.** Open question Q-01. `Mark.tsx` takes segment count as a
+  parameter, so trying three is a one-line change.

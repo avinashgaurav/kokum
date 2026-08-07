@@ -7,6 +7,13 @@ export type RecipeDiet = 'veg' | 'egg' | 'nonveg';
 export type Cooktop = 'gas' | 'induction' | 'both';
 export type Equipment = 'cooker' | 'mixer' | 'oven' | 'airfryer' | 'microwave' | 'tawa' | 'kadhai';
 
+/**
+ * Fasting and festival observances. Each is a hard filter, not a preference: a household
+ * keeping vrat during Navratri cannot eat onion, garlic or grain, and offering them a dish
+ * containing any is the same class of mistake as ignoring an allergy.
+ */
+export type Observance = 'navratri' | 'shravan' | 'ekadashi' | 'no-onion-garlic';
+
 export interface Ingredient {
   id: string;
   name: string;
@@ -26,6 +33,19 @@ export interface Ingredient {
   /** False for onion, garlic and root vegetables. */
   jainSafe: boolean;
   vegan: boolean;
+  /** False for onion and garlic. Several observances exclude them. */
+  alliumFree: boolean;
+  /** False for wheat, rice and pulses, which vrat observances exclude. */
+  vratSafe: boolean;
+  /** Rough retail cost per base unit, in paise. Drives the budget read. */
+  paisePerUnit: number;
+  /**
+   * Per ONE base unit, not per 100. Per gram for g, per ml for ml, per egg for piece.
+   * Keeping it per-unit means every calculation is a plain multiply by quantity, with no
+   * unit-dependent divisor to get wrong.
+   */
+  kcalPerUnit: number;
+  proteinPerUnit: number;
 }
 
 export interface PantryItem {
@@ -82,6 +102,21 @@ export interface Household {
   equipment: Equipment[];
   maxMinutesWeekday: number;
   maxMinutesWeekend: number;
+  /** Active fasting or festival filters. Empty means no filter. */
+  observances: Observance[];
+  /** Weekly grocery budget in paise. Undefined means not tracked. */
+  weeklyBudgetPaise?: number;
+}
+
+/** Cooked food already in the fridge. Always beats cooking something new from scratch. */
+export interface Leftover {
+  id: string;
+  recipeId: string | null;
+  label: string;
+  portions: number;
+  createdAt: number;
+  /** Cooked food keeps about two days refrigerated. */
+  expiresAt: number;
 }
 
 export interface CookLogEntry {

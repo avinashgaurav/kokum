@@ -22,7 +22,7 @@ import { rerank } from '../ai/rerank';
 
 const MOODS = ['comfort', 'quick', 'light', 'wholesome', 'weekend', 'impress', 'breakfast'];
 
-export function TodayScreen() {
+export function TodayScreen({ navigation }: { navigation: { navigate: (s: string) => void } }) {
   const { state, dispatch } = useStore();
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState<string | null>(null);
@@ -113,11 +113,18 @@ export function TodayScreen() {
     <View style={s.screen}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.header}>
-          <Text style={type.display}>Tonight</Text>
-          <Text style={[type.small, { color: color.muted }]}>
-            {state.household.adults + state.household.children} eating ·{' '}
-            {state.household.cooktop}
-          </Text>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={type.display}>Tonight</Text>
+            <Text style={[type.small, { color: color.muted }]}>
+              {state.household.adults + state.household.children} eating ·{' '}
+              {state.household.cooktop}
+            </Text>
+          </View>
+          <Button
+            label="Plan the week"
+            variant="secondary"
+            onPress={() => navigation.navigate('Week')}
+          />
         </View>
 
         <TextInput
@@ -281,7 +288,7 @@ function DishCard({
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.canvas },
   scroll: { padding: space.base, gap: space.base },
-  header: { gap: 2 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   input: {
     minHeight: TOUCH_PRIMARY,
     backgroundColor: color.card,

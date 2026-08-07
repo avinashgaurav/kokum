@@ -74,6 +74,30 @@ export function passesHardConstraints(
   if (recipe.cooktop === 'gas-only' && h.cooktop === 'induction') return false;
   if (maxMinutes !== undefined && recipe.minutes > maxMinutes) return false;
 
+  // Observances are hard filters, not preferences. A household keeping vrat cannot eat
+  // grain; offering it is the same class of mistake as ignoring an allergy.
+  for (const obs of h.observances) {
+    for (const ri of recipe.ingredients) {
+      const ing = ingredients.get(ri.ingredientId);
+      if (!ing) continue;
+      switch (obs) {
+        case 'no-onion-garlic':
+        case 'shravan':
+        case 'ekadashi':
+          if (!ing.alliumFree) return false;
+          break;
+        case 'navratri':
+          // Vrat excludes grain and pulses as well as allium.
+          if (!ing.alliumFree || !ing.vratSafe) return false;
+          break;
+      }
+    }
+    // Shravan and Ekadashi are also observed as vegetarian in most households.
+    if ((obs === 'shravan' || obs === 'ekadashi' || obs === 'navratri') && recipe.diet !== 'veg') {
+      return false;
+    }
+  }
+
   return true;
 }
 

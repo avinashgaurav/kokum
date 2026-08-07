@@ -128,3 +128,79 @@ sharing.
 | Q-03 | Which OCR path for bill import: on-device Vision framework, or cloud with text-only egress? | Phase 1 |
 | Q-04 | Is a brand line needed separately from the store subtitle? ("Cook with certainty." was the runner-up.) | Not blocking |
 | Q-05 | Do the deep-link URL schemes in `INTEGRATIONS.md` still resolve on a real device? | Phase 2 |
+
+---
+
+## D-009 · Database: Supabase, additive to a local-first core
+**Date:** 2026-08-07 · **Status:** Locked · **Supersedes the SQLite half of D-008**
+
+Postgres with row-level security, used for exactly one thing: letting two phones share a
+pantry. The device stays the source of truth. Every screen renders from local state and every
+engine call runs offline, so the app is fully usable with no account and no network.
+
+Sync is last-write-wins per row on `last_confirmed_at`. That is the correct rule for this
+data, not a shortcut: a pantry row means "the last time a human looked, this was true", and
+two people cannot both be right about how much atta is in the jar.
+
+Note that D-008 said local SQLite. Local persistence is currently AsyncStorage, which is a
+stopgap for both: it is fine at 40 pantry rows and wrong at 400. See DATA-MODEL.md.
+
+---
+
+## D-010 · Voice input: keyboard dictation, not a speech-recognition module
+**Date:** 2026-08-07 · **Status:** Locked
+
+The capture screen offers a text field and tells the user to press the microphone on their
+own keyboard.
+
+Considered and rejected: `expo-speech-recognition` and `@react-native-voice/voice`. Both need
+a development build, so neither runs in Expo Go, and both add a native dependency and a
+permissions flow.
+
+The keyboard already does this well. It respects whatever language the user has configured,
+handles Hinglish exactly as well as their phone already does, needs no permission prompt, and
+works today. The parse quality is identical because both paths end up as text going to the
+same parser.
+
+---
+
+## D-011 · Model: claude-opus-5
+**Date:** 2026-08-07 · **Status:** Locked
+
+Used for three things: parsing captures, reranking and explaining suggestions, and mapping
+free-text moods onto tags.
+
+The deterministic engine does all the load-bearing work, so the volume is low: one rerank per
+meaningful state change, one parse per capture. Structured outputs (`output_config.format`)
+are used everywhere, so the shape is guaranteed and only the meaning needs re-validating.
+
+The API key lives in the device keychain and is entered by the user. That is right for a
+personal app and wrong for a multi-tenant product, which would proxy through a server holding
+one key. `src/ai/client.ts` is the seam where that proxy goes.
+
+---
+
+## D-012 · Fasting and festival filters are hard constraints
+**Date:** 2026-08-07 · **Status:** Locked
+
+Navratri, Shravan, Ekadashi and a standing no-onion-garlic option filter suggestions at the
+same severity as an allergy, in both push and pull.
+
+The reasoning: a household keeping vrat that is served grain has been failed in the same way
+as a household with a dairy allergy served paneer. Treating observances as a soft preference
+would mean the app is only trustworthy for people who do not keep any.
+
+---
+
+## Open questions, updated 2026-08-07
+
+| # | Question | Blocking |
+|---|---|---|
+| Q-01 | Does the six-segment mark read as a spinner on a real home screen? Three segments instead? | Store listing |
+| Q-02 | Recipe corpus: how to get from 14 to ~500 without flipping `verified` in bulk | The next real milestone |
+| Q-05 | Do the deep-link URL schemes still resolve on a real device? | Shipping. Nothing has been device-tested. |
+| Q-06 | Has the Supabase migration ever been applied to a live project? | Sharing. RLS policies are unverified in practice. |
+| Q-07 | Should par levels and burn rates learn per household, and what signal trains them? | Not blocking |
+
+Closed since the last revision: Q-03 (OCR path, answered by Claude vision), Q-04 (brand line,
+folded into the tagline decision).

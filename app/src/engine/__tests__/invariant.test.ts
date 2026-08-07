@@ -24,6 +24,7 @@ const HOUSE: Household = {
   equipment: ['cooker', 'mixer', 'kadhai', 'tawa'],
   maxMinutesWeekday: 45,
   maxMinutesWeekend: 90,
+  observances: [],
 };
 
 function item(

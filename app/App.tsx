@@ -12,6 +12,7 @@ import { PantryScreen } from './src/screens/PantryScreen';
 import { OrderScreen } from './src/screens/OrderScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { CaptureScreen } from './src/screens/CaptureScreen';
+import { WeekScreen } from './src/screens/WeekScreen';
 import { Mark } from './src/components/Mark';
 import { color, type } from './src/theme';
 
@@ -23,6 +24,7 @@ import { color, type } from './src/theme';
  */
 const Tab = createBottomTabNavigator();
 const PantryStack = createNativeStackNavigator();
+const TodayStack = createNativeStackNavigator();
 
 const navTheme: Theme = {
   dark: false,
@@ -52,6 +54,15 @@ function PantryFlow() {
         options={{ presentation: 'modal' }}
       />
     </PantryStack.Navigator>
+  );
+}
+
+function TodayFlow() {
+  return (
+    <TodayStack.Navigator screenOptions={{ headerShown: false }}>
+      <TodayStack.Screen name="TodayHome" component={TodayScreen} />
+      <TodayStack.Screen name="Week" component={WeekScreen} options={{ presentation: 'modal' }} />
+    </TodayStack.Navigator>
   );
 }
 
@@ -89,7 +100,7 @@ export default function App() {
           >
             <Tab.Screen
               name="Today"
-              component={TodayScreen}
+              component={TodayFlow}
               options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={6} /> }}
             />
             <Tab.Screen

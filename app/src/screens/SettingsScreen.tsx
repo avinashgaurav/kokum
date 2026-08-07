@@ -1,10 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, Chip, SectionLabel } from '../components/ui';
 import { useStore } from '../store/useStore';
-import type { Cooktop, Diet, Equipment } from '../engine/types';
+import type { Cooktop, Diet, Equipment, Observance } from '../engine/types';
+import { RECIPE_INDEX } from '../data/recipes';
+import { INGREDIENT_INDEX } from '../data/ingredients';
+import { rupees, weekInsights } from '../engine/insights';
+import {
+  CLOUD_CONFIGURED,
+  currentSession,
+  joinHousehold,
+  signIn,
+  signOut,
+  type CloudSession,
+} from '../db/supabase';
+import { syncPantry } from '../db/sync';
 import { getApiKey, setApiKey } from '../ai/client';
 
 const DIETS: { id: Diet; label: string }[] = [
@@ -32,6 +44,20 @@ const EQUIPMENT: { id: Equipment; label: string }[] = [
 ];
 
 const ALLERGENS = ['dairy', 'gluten', 'egg', 'nuts'];
+
+const OBSERVANCES: { id: Observance; label: string; note: string }[] = [
+  { id: 'no-onion-garlic', label: 'No onion or garlic', note: 'Always on' },
+  { id: 'navratri', label: 'Navratri vrat', note: 'No allium, no grain or pulses' },
+  { id: 'shravan', label: 'Shravan', note: 'Vegetarian, no allium' },
+  { id: 'ekadashi', label: 'Ekadashi', note: 'Vegetarian, no allium' },
+];
+
+const BUDGETS = [
+  { label: 'Not tracked', paise: undefined },
+  { label: 'Rs 1,500', paise: 150_000 },
+  { label: 'Rs 2,500', paise: 250_000 },
+  { label: 'Rs 4,000', paise: 400_000 },
+];
 
 export function SettingsScreen() {
   const { state, dispatch } = useStore();
@@ -135,6 +161,49 @@ export function SettingsScreen() {
         </View>
       </Card>
 
+      <Card style={{ gap: space.md }}>
+        <SectionLabel>Fasting and festivals</SectionLabel>
+        <View style={s.chips}>
+          {OBSERVANCES.map((o) => (
+            <Chip
+              key={o.id}
+              label={o.label}
+              active={h.observances.includes(o.id)}
+              onPress={() => set({ observances: toggle(h.observances, o.id) })}
+            />
+          ))}
+        </View>
+        <Text style={[type.small, { color: color.muted }]}>
+          {h.observances.length === 0
+            ? 'Turn one on and it filters every suggestion, the same way an allergy does.'
+            : OBSERVANCES.filter((o) => h.observances.includes(o.id))
+                .map((o) => `${o.label}: ${o.note.toLowerCase()}`)
+                .join('. ') + '.'}
+        </Text>
+      </Card>
+
+      <Card style={{ gap: space.md }}>
+        <SectionLabel>Weekly grocery budget</SectionLabel>
+        <View style={s.chips}>
+          {BUDGETS.map((b) => (
+            <Chip
+              key={b.label}
+              label={b.label}
+              active={h.weeklyBudgetPaise === b.paise}
+              onPress={() => set({ weeklyBudgetPaise: b.paise })}
+            />
+          ))}
+        </View>
+        <Text style={[type.small, { color: color.muted }]}>
+          Estimated from what you cook, using rough retail prices. Useful as a direction, not
+          as an accounting of what you actually spent.
+        </Text>
+      </Card>
+
+      <SharingCard />
+
+      <InsightsCard />
+
       <ApiKeyCard />
 
       <Card style={{ gap: space.sm }}>
@@ -150,6 +219,253 @@ export function SettingsScreen() {
 
       <View style={{ height: 40 }} />
     </ScrollView>
+  );
+}
+
+/**
+ * Household sharing.
+ *
+ * Optional in every sense: absent config, this card explains that and does nothing. The app
+ * is local-first, so sync adds a second phone rather than becoming the source of truth. A
+ * failed sync leaves the local pantry exactly as it was.
+ */
+function SharingCard() {
+  const { state, dispatch } = useStore();
+  const [session, setSession] = useState<CloudSession | null>(null);
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    currentSession().then((sess) => {
+      if (!cancelled) setSession(sess);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!CLOUD_CONFIGURED) {
+    return (
+      <Card style={{ gap: space.sm }}>
+        <SectionLabel>Sharing with someone</SectionLabel>
+        <Text style={[type.body, { color: color.inkSoft }]}>
+          Not set up in this build. Kokum runs entirely on this phone, which is why everything
+          else works with no account and no connection.
+        </Text>
+        <Text style={[type.small, { color: color.muted }]}>
+          To share a pantry with someone, add a Supabase URL and anon key to .env and run the
+          migrations in supabase/migrations.
+        </Text>
+      </Card>
+    );
+  }
+
+  async function doSync() {
+    setBusy(true);
+    const result = await syncPantry({
+      household: state.household,
+      pantry: state.pantry,
+      cookLog: state.cookLog,
+      leftovers: state.leftovers,
+    });
+    if (result.ok && result.merged) {
+      dispatch({ type: 'merge-pantry', pantry: result.merged });
+    }
+    setNote(result.message);
+    setBusy(false);
+  }
+
+  return (
+    <Card style={{ gap: space.md }}>
+      <SectionLabel>Sharing with someone</SectionLabel>
+
+      {session ? (
+        <>
+          <Text style={[type.body, { color: color.inkSoft }]}>
+            Signed in as {session.email ?? 'your account'}.
+          </Text>
+
+          {session.householdId ? (
+            <>
+              <Text style={[type.small, { color: color.muted }]}>
+                Household code. Whoever else cooks here enters this on their phone.
+              </Text>
+              <Text selectable style={s.code}>
+                {session.householdId}
+              </Text>
+            </>
+          ) : null}
+
+          <Button label={busy ? 'Syncing' : 'Sync now'} onPress={doSync} disabled={busy} />
+
+          <View style={{ flexDirection: 'row', gap: space.sm, alignItems: 'center' }}>
+            <TextInput
+              value={code}
+              onChangeText={setCode}
+              placeholder="Join another household"
+              placeholderTextColor={color.muted}
+              style={[s.keyInput, { flex: 1 }]}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Button
+              label="Join"
+              variant="secondary"
+              disabled={!code.trim() || busy}
+              onPress={async () => {
+                setBusy(true);
+                const r = await joinHousehold(code.trim());
+                setNote(r.message);
+                if (r.ok) setSession(await currentSession());
+                setCode('');
+                setBusy(false);
+              }}
+            />
+          </View>
+
+          <Button
+            label="Sign out"
+            variant="quiet"
+            onPress={async () => {
+              await signOut();
+              setSession(null);
+              setNote(null);
+            }}
+          />
+
+          <Text style={[type.small, { color: color.muted }]}>
+            When two phones disagree about an item, the more recent look at the kitchen wins.
+            Nothing is merged behind your back.
+          </Text>
+        </>
+      ) : (
+        <>
+          <Text style={[type.body, { color: color.inkSoft }]}>
+            Sign in to share one pantry across phones, so whoever gets home first can mark the
+            paneer finished.
+          </Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            placeholderTextColor={color.muted}
+            style={s.keyInput}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            accessibilityLabel="Email for a sign-in link"
+          />
+          <Button
+            label="Email me a link"
+            disabled={!email.trim() || busy}
+            onPress={async () => {
+              setBusy(true);
+              const r = await signIn(email);
+              setNote(r.message);
+              setBusy(false);
+            }}
+          />
+        </>
+      )}
+
+      {note ? <Text style={[type.small, { color: color.petrol }]}>{note}</Text> : null}
+    </Card>
+  );
+}
+
+/**
+ * The weekly read: nutrition, spend and waste.
+ *
+ * Every number here is a heuristic derived from the cook log and shelf-life clocks, not a
+ * measurement, and the copy says so. When there is not enough logged cooking to say anything
+ * honest, the headline is null and this card says that rather than inventing an observation.
+ */
+function InsightsCard() {
+  const { state } = useStore();
+  const now = Date.now();
+
+  const insights = useMemo(
+    () =>
+      weekInsights(
+        state.cookLog,
+        RECIPE_INDEX,
+        INGREDIENT_INDEX,
+        state.pantry,
+        state.household,
+        now,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.cookLog, state.pantry, state.household],
+  );
+
+  if (insights.daysCooked === 0) {
+    return (
+      <Card style={{ gap: space.sm }}>
+        <SectionLabel>This week</SectionLabel>
+        <Text style={[type.body, { color: color.muted }]}>
+          Nothing logged yet. Tap "I cooked this" on Today and this fills in.
+        </Text>
+      </Card>
+    );
+  }
+
+  return (
+    <Card style={{ gap: space.md }}>
+      <SectionLabel>This week</SectionLabel>
+
+      <View style={s.statRow}>
+        <Stat label="Days cooked" value={String(insights.daysCooked)} />
+        <Stat label="Cuisines" value={String(insights.varietyCount)} />
+        <Stat
+          label="Protein / day"
+          value={insights.proteinPerAdultPerDay > 0 ? `${insights.proteinPerAdultPerDay} g` : 'Not yet'}
+        />
+      </View>
+
+      <View style={s.statRow}>
+        <Stat
+          label="Kcal / day"
+          value={insights.kcalPerAdultPerDay > 0 ? String(insights.kcalPerAdultPerDay) : 'Not yet'}
+        />
+        <Stat label="Groceries used" value={rupees(insights.spentPaise)} />
+        <Stat
+          label="Went off"
+          value={insights.wastedPaise > 0 ? rupees(insights.wastedPaise) : 'None'}
+        />
+      </View>
+
+      {insights.headline ? (
+        <Text style={[type.body, { color: color.inkSoft }]}>{insights.headline}</Text>
+      ) : (
+        <Text style={[type.small, { color: color.muted }]}>
+          Not enough cooking logged this week to say anything useful yet.
+        </Text>
+      )}
+
+      {insights.wasted.length > 0 ? (
+        <Text style={[type.small, { color: color.muted }]}>
+          Past its date:{' '}
+          {insights.wasted
+            .slice(0, 4)
+            .map((w) => INGREDIENT_INDEX.get(w.ingredientId)?.name.toLowerCase() ?? w.ingredientId)
+            .join(', ')}
+          . This is an estimate from shelf-life dates, so something you ate and never confirmed
+          will show up here too.
+        </Text>
+      ) : null}
+    </Card>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={{ flex: 1, gap: 2 }}>
+      <Text style={[type.numeral, { fontSize: 19 }]}>{value}</Text>
+      <Text style={[type.small, { color: color.muted, fontSize: 11.5 }]}>{label}</Text>
+    </View>
   );
 }
 
@@ -274,6 +590,15 @@ const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.canvas },
   scroll: { padding: space.base, gap: space.base },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  statRow: { flexDirection: 'row', gap: space.md },
+  code: {
+    fontFamily: 'Courier',
+    fontSize: 13,
+    color: color.petrol,
+    backgroundColor: color.petrolWash,
+    padding: space.md,
+    borderRadius: radius.sm,
+  },
   stepRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   stepBtn: {
