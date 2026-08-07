@@ -17,7 +17,13 @@
       "supportsTablet": true,
       "bundleIdentifier": "dev.kokum.app",
       "infoPlist": {
-        "LSApplicationQueriesSchemes": ["zepto", "grofers", "blinkit", "swiggy", "zomato"]
+        "LSApplicationQueriesSchemes": [
+          "zepto",
+          "grofers",
+          "blinkit",
+          "swiggy",
+          "zomato"
+        ]
       }
     },
     "android": {
@@ -29,6 +35,9 @@
     },
     "web": {
       "bundler": "metro"
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

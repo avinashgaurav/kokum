@@ -1,10 +1,11 @@
-import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { color, radius, space, type, TOUCH_MIN } from '../theme';
-import { Card, Chip, SectionLabel } from '../components/ui';
+import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
+import { Button, Card, Chip, SectionLabel } from '../components/ui';
 import { useStore } from '../store/useStore';
 import type { Cooktop, Diet, Equipment } from '../engine/types';
+import { getApiKey, setApiKey } from '../ai/client';
 
 const DIETS: { id: Diet; label: string }[] = [
   { id: 'veg', label: 'Veg' },
@@ -134,6 +135,8 @@ export function SettingsScreen() {
         </View>
       </Card>
 
+      <ApiKeyCard />
+
       <Card style={{ gap: space.sm }}>
         <SectionLabel>About</SectionLabel>
         <Text style={[type.body, { color: color.inkSoft }]}>
@@ -147,6 +150,86 @@ export function SettingsScreen() {
 
       <View style={{ height: 40 }} />
     </ScrollView>
+  );
+}
+
+/**
+ * Claude API key. Stored in the device keychain via expo-secure-store, never in app state
+ * and never written to disk in plaintext. Everything except photo and voice reading works
+ * without it, so this screen says so plainly rather than nagging.
+ */
+function ApiKeyCard() {
+  const [key, setKey] = useState('');
+  const [saved, setSaved] = useState<boolean | null>(null);
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getApiKey().then((k) => {
+      if (!cancelled) setSaved(k !== null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function save() {
+    await setApiKey(key);
+    setSaved(key.trim().length > 0);
+    setKey('');
+    setEditing(false);
+  }
+
+  return (
+    <Card style={{ gap: space.md }}>
+      <SectionLabel>Reading photos and voice</SectionLabel>
+
+      {saved && !editing ? (
+        <>
+          <Text style={[type.body, { color: color.inkSoft }]}>
+            Your Claude key is set. Photo and voice capture are working.
+          </Text>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            <View style={{ flex: 1 }}>
+              <Button label="Replace key" variant="secondary" onPress={() => setEditing(true)} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button
+                label="Remove"
+                variant="quiet"
+                onPress={async () => {
+                  await setApiKey('');
+                  setSaved(false);
+                }}
+              />
+            </View>
+          </View>
+        </>
+      ) : (
+        <>
+          <Text style={[type.body, { color: color.inkSoft }]}>
+            Kokum uses Claude to read grocery bills, handwritten lists and spoken input. Paste a
+            key from console.anthropic.com to turn that on.
+          </Text>
+          <TextInput
+            value={key}
+            onChangeText={setKey}
+            placeholder="sk-ant-..."
+            placeholderTextColor={color.muted}
+            style={s.keyInput}
+            autoCapitalize="none"
+            autoCorrect={false}
+            secureTextEntry
+            accessibilityLabel="Claude API key"
+          />
+          <Button label="Save key" onPress={save} disabled={!key.trim()} />
+          <Text style={[type.small, { color: color.muted }]}>
+            Stored in your phone's keychain. It goes to Anthropic and nowhere else. Everything
+            else in Kokum works without it.
+          </Text>
+        </>
+      )}
+    </Card>
   );
 }
 
@@ -203,4 +286,14 @@ const s = StyleSheet.create({
   },
   stepGlyph: { fontSize: 22, color: color.petrol, fontWeight: '600', lineHeight: 26 },
   stepValue: { minWidth: 28, textAlign: 'center' },
+  keyInput: {
+    minHeight: TOUCH_PRIMARY,
+    backgroundColor: color.canvas,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: color.line,
+    paddingHorizontal: space.base,
+    ...type.body,
+    color: color.ink,
+  },
 });

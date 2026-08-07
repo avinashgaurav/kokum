@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -18,6 +18,7 @@ import { suggest, surpriseMe, type SuggestInput } from '../engine/suggest';
 import { formatQuantity } from '../engine/scaling';
 import type { Suggestion } from '../engine/types';
 import { FOOD_PROVIDERS, GROCERY_PROVIDERS, openSearch } from '../integrations/order';
+import { rerank } from '../ai/rerank';
 
 const MOODS = ['comfort', 'quick', 'light', 'wholesome', 'weekend', 'impress', 'breakfast'];
 
@@ -55,6 +56,56 @@ export function TodayScreen() {
       }),
     [input, isPull, query, mood],
   );
+
+  /**
+   * Claude's ordering and sentences, keyed by recipe id. The screen renders the
+   * deterministic result first and swaps these in when they arrive, so the app is never
+   * waiting on the network to tell you what to cook. Offline, this map just stays empty.
+   *
+   * Only the sentence and the order come from Claude. Every dish state and missing-item
+   * list on screen is the one this device computed. See AGENTS.md.
+   */
+  const [aiReasons, setAiReasons] = useState<Record<string, string>>({});
+  const [aiOrder, setAiOrder] = useState<string[] | null>(null);
+  const requestSeq = useRef(0);
+
+  useEffect(() => {
+    if (results.length === 0) {
+      setAiReasons({});
+      setAiOrder(null);
+      return;
+    }
+    const seq = ++requestSeq.current;
+    let cancelled = false;
+
+    (async () => {
+      const out = await rerank(
+        results,
+        state.household,
+        [...state.pantry.keys()],
+        query.trim() || mood || undefined,
+      );
+      // Drop anything that came back after the user moved on.
+      if (cancelled || seq !== requestSeq.current || !out.ok) return;
+      setAiReasons(Object.fromEntries(out.value.map((r) => [r.suggestion.recipe.id, r.reason])));
+      setAiOrder(out.value.map((r) => r.suggestion.recipe.id));
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results]);
+
+  /** Apply Claude's order if we have one, otherwise keep the deterministic order. */
+  const shown = useMemo(() => {
+    if (!aiOrder) return results;
+    const byId = new Map(results.map((r) => [r.recipe.id, r]));
+    const ordered = aiOrder.map((id) => byId.get(id)).filter((x): x is Suggestion => !!x);
+    // Anything the reranker did not mention still appears, after the rest.
+    for (const r of results) if (!aiOrder.includes(r.recipe.id)) ordered.push(r);
+    return ordered;
+  }, [results, aiOrder]);
 
   if (!state.hydrated) return <View style={s.screen} />;
 
@@ -96,7 +147,7 @@ export function TodayScreen() {
           </Text>
         ) : null}
 
-        {results.length === 0 ? (
+        {shown.length === 0 ? (
           <Empty
             title="Nothing to suggest yet"
             body="Your pantry does not have enough in it to back a dish. Add what you have and this fills up."
@@ -104,10 +155,11 @@ export function TodayScreen() {
             onAction={() => setQuery('')}
           />
         ) : (
-          results.map((sg) => (
+          shown.map((sg) => (
             <DishCard
               key={sg.recipe.id}
               suggestion={sg}
+              reason={aiReasons[sg.recipe.id] ?? sg.reason}
               onCook={() => dispatch({ type: 'cook', recipe: sg.recipe, now: Date.now() })}
             />
           ))
@@ -118,6 +170,7 @@ export function TodayScreen() {
             <SectionLabel>Surprise</SectionLabel>
             <DishCard
               suggestion={surprise}
+              reason={aiReasons[surprise.recipe.id] ?? surprise.reason}
               onCook={() => {
                 dispatch({ type: 'cook', recipe: surprise.recipe, now: Date.now() });
                 setSurprise(null);
@@ -142,8 +195,16 @@ export function TodayScreen() {
   );
 }
 
-function DishCard({ suggestion, onCook }: { suggestion: Suggestion; onCook: () => void }) {
-  const { recipe, assessment, reason } = suggestion;
+function DishCard({
+  suggestion,
+  reason,
+  onCook,
+}: {
+  suggestion: Suggestion;
+  reason: string;
+  onCook: () => void;
+}) {
+  const { recipe, assessment } = suggestion;
   const missingNames = assessment.missing.map(
     (m) => INGREDIENT_INDEX.get(m.ingredientId)?.name ?? m.ingredientId,
   );

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
+import { color, radius, shadow, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, SectionLabel } from '../components/ui';
 import { StockMark } from '../components/Mark';
 import { useStore } from '../store/useStore';
@@ -10,7 +10,7 @@ import { COOK_THRESHOLD, confidenceOf, projectedQuantity, weeklyCheckQueue } fro
 import { formatQuantity } from '../engine/scaling';
 import type { Ingredient, PantryItem } from '../engine/types';
 
-export function PantryScreen() {
+export function PantryScreen({ navigation }: { navigation: { navigate: (s: string) => void } }) {
   const { state, dispatch } = useStore();
   const [query, setQuery] = useState('');
   const [checking, setChecking] = useState(false);
@@ -73,7 +73,8 @@ export function PantryScreen() {
   }
 
   return (
-    <ScrollView style={s.screen} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+    <View style={s.screen}>
+    <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
       <View style={s.header}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={type.display}>Pantry</Text>
@@ -153,8 +154,19 @@ export function PantryScreen() {
         </View>
       ) : null}
 
-      <View style={{ height: 40 }} />
+      <View style={{ height: 96 }} />
     </ScrollView>
+
+    {/* Capture is the highest-value repeated action, so it gets the thumb-zone slot. */}
+    <Pressable
+      onPress={() => navigation.navigate('Capture')}
+      accessibilityRole="button"
+      accessibilityLabel="Add groceries by photo or voice"
+      style={({ pressed }) => [s.fab, pressed && { transform: [{ scale: 0.95 }] }]}
+    >
+      <Text style={s.fabGlyph}>+</Text>
+    </Pressable>
+    </View>
   );
 }
 
@@ -301,4 +313,18 @@ const s = StyleSheet.create({
   rowLine: { borderBottomWidth: 1, borderBottomColor: color.lineSoft },
   dot: { width: 10, height: 10, borderRadius: 5 },
   checkWrap: { padding: space.lg, justifyContent: 'center', gap: space.sm },
+  fab: {
+    position: 'absolute',
+    right: space.base,
+    bottom: space.lg,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: color.petrol,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadow.card,
+    shadowOpacity: 0.22,
+  },
+  fabGlyph: { color: color.onPetrol, fontSize: 32, fontWeight: '400', lineHeight: 36 },
 });
