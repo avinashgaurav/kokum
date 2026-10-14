@@ -20,7 +20,7 @@ import { color, type } from './src/theme';
  * Three tabs, never more: Today, Pantry, Order. Setup rides along as a fourth entry only
  * because a tab-only shell has nowhere else to put it; when a header lands it moves behind
  * a profile icon. Capture is a modal off the Pantry stack, not a tab, because adding
- * groceries is an action rather than a place. See UI-UX.md.
+ * groceries is an action rather than a place.
  */
 const Tab = createBottomTabNavigator();
 const PantryStack = createNativeStackNavigator();

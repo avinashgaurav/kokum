@@ -270,6 +270,15 @@ language sql security definer stable set search_path = public as $$
   );
 $$;
 
+-- Owner check for membership writes. Same security-definer pattern, for the same reason.
+create or replace function is_household_owner(h uuid) returns boolean
+language sql security definer stable set search_path = public as $$
+  select exists (
+    select 1 from household_member
+    where household_id = h and user_id = auth.uid() and role = 'owner'
+  );
+$$;
+
 alter table household        enable row level security;
 alter table household_member enable row level security;
 alter table pantry_item      enable row level security;
@@ -291,8 +300,15 @@ create policy household_rw on household
 create policy member_read on household_member
   for select using (user_id = auth.uid() or is_household_member(household_id));
 
-create policy member_write on household_member
-  for all using (is_household_member(household_id)) with check (is_household_member(household_id));
+-- Only the household owner may add, change or remove membership rows. Any member (including
+-- the cook role) may remove their own row, which is how someone leaves a household. Without
+-- the role check, any member could add strangers, promote themselves, or delete the owner.
+create policy member_insert on household_member
+  for insert with check (is_household_owner(household_id));
+create policy member_update on household_member
+  for update using (is_household_owner(household_id)) with check (is_household_owner(household_id));
+create policy member_delete on household_member
+  for delete using (is_household_owner(household_id) or user_id = auth.uid());
 
 create policy pantry_rw on pantry_item
   for all using (is_household_member(household_id)) with check (is_household_member(household_id));

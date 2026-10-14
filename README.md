@@ -34,6 +34,12 @@ npx expo export --platform android --output-dir dist && rm -rf dist
 
 Current status: typecheck clean, **48 of 48 engine tests passing**, Metro bundles 1135 modules.
 
+## Status
+
+Pre-release. Not yet run on a physical device. The AI layer (parsing, reranking, mood) has no
+eval yet; only the deterministic engine is tested (48 tests). The Supabase migration has not
+been applied to a live project. Details under Known gaps below.
+
 ## The one rule
 
 The app never asserts you have something you might not. Every dish carries a state computed by
@@ -86,7 +92,7 @@ pantry unreviewed. Detail in [AI-ENGINE.md](AI-ENGINE.md).
 ## Layout
 
 ```
-Guess/
+kokum/
   AGENTS.md            rules for anyone, human or model, changing this
   DECISIONS.md         every locked decision with its reasoning
   INVENTORY.md         the depletion and confidence model

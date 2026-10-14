@@ -92,7 +92,7 @@ Chosen from ten premium marks in the Route B language (jar, bowl, tapered vessel
 split circle, lid, measuring cup, gauge ring, five of six, moon-phase fill).
 
 **Open risk to resolve in production art:** a segmented ring is one visual step away from a
-loading spinner. Mitigations to test before shipping, in `UI-UX.md` §4.
+loading spinner. Mitigations are still to be written up; tracked as open question Q-01.
 
 ---
 
@@ -105,15 +105,15 @@ Three beats naming the three tabs, which makes it descriptive and immediately cl
 honestly at decision time: it explains the app rather than making someone want it, so the
 marketing site and store screenshots have to carry the desire that the line does not.
 
-Useful consequence: the three beats and the icon can reinforce each other. See the open
-question in `UI-UX.md` §4 about reducing the mark from six segments to three.
+Useful consequence: the three beats and the icon can reinforce each other. See open
+question Q-01 about reducing the mark from six segments to three.
 
 ---
 
 ## D-008 · Stack: Expo, TypeScript, React Native, local-first SQLite
 **Date:** 2026-08-07 · **Status:** Locked
 
-Matches the working setup in `~/Desktop/Personal/VehicleX/app/`. Local-first via `expo-sqlite`;
+Matches the owner's existing working Expo setup from an earlier app. Local-first via `expo-sqlite`;
 the app must be fully usable with no network. Cloud sync is opt-in and only needed for household
 sharing.
 
@@ -204,3 +204,20 @@ would mean the app is only trustworthy for people who do not keep any.
 
 Closed since the last revision: Q-03 (OCR path, answered by Claude vision), Q-04 (brand line,
 folded into the tagline decision).
+
+---
+
+## D-013 · Membership writes are owner-only
+**Date:** 2026-10-14 · **Status:** Locked
+
+The original `member_write` policy let any household member, including the `cook` role, insert,
+update or delete any membership row, including the owner's. It is replaced by three policies:
+insert and update require the `owner` role (via `is_household_owner`), and delete is allowed for
+the owner or for a member removing their own row, which is how someone leaves a household.
+Reading is unchanged.
+
+Fixed in place in `0001_init.sql` because the migration has never been applied to a live
+project. Consequence: `joinHousehold` in `app/src/db/supabase.ts`, which inserts the caller's
+own row, was already rejected by RLS (the caller is not yet a member) and still is. Joining
+needs an owner-issued invite, for example a security-definer RPC that redeems an invite code.
+Not built yet.
