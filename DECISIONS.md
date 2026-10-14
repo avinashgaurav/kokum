@@ -221,3 +221,7 @@ project. Consequence: `joinHousehold` in `app/src/db/supabase.ts`, which inserts
 own row, was already rejected by RLS (the caller is not yet a member) and still is. Joining
 needs an owner-issued invite, for example a security-definer RPC that redeems an invite code.
 Not built yet.
+
+Also hardened in place: the security-definer helpers are schema-qualified and executable by
+`authenticated` only, and a `household_member_keep_owner` trigger refuses removing or demoting
+a household's last owner, or changing a row's `household_id` or `user_id`.

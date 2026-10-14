@@ -262,22 +262,80 @@ create trigger pantry_item_touch
 -- policy. A plain subquery against household_member inside a household_member policy
 -- recurses; this breaks the cycle.
 -- ---------------------------------------------------------------------------
-create or replace function is_household_member(h uuid) returns boolean
+--
+-- Every security-definer function below names its objects with their schema and pins
+-- search_path, so a caller cannot shadow a table or function with one of their own. Execute
+-- is revoked from public and anon (Supabase grants it to both by default) and granted only to
+-- the role that needs it.
+-- ---------------------------------------------------------------------------
+create or replace function public.is_household_member(h uuid) returns boolean
 language sql security definer stable set search_path = public as $$
   select exists (
-    select 1 from household_member
-    where household_id = h and user_id = auth.uid()
+    select 1 from public.household_member m
+    where m.household_id = h and m.user_id = auth.uid()
   );
 $$;
 
+revoke execute on function public.is_household_member(uuid) from public, anon;
+grant execute on function public.is_household_member(uuid) to authenticated;
+
 -- Owner check for membership writes. Same security-definer pattern, for the same reason.
-create or replace function is_household_owner(h uuid) returns boolean
+create or replace function public.is_household_owner(h uuid) returns boolean
 language sql security definer stable set search_path = public as $$
   select exists (
-    select 1 from household_member
-    where household_id = h and user_id = auth.uid() and role = 'owner'
+    select 1 from public.household_member m
+    where m.household_id = h and m.user_id = auth.uid() and m.role = 'owner'
   );
 $$;
+
+revoke execute on function public.is_household_owner(uuid) from public, anon;
+grant execute on function public.is_household_owner(uuid) to authenticated;
+
+-- A household must always have an owner. RLS decides WHO may change membership; this decides
+-- what no change may do: demote or remove the last owner, which would leave a household nobody
+-- can manage. It also pins a row to its household and user: moving a membership row is a
+-- delete and an insert, each checked by its own policy, never an update.
+--
+-- Two deletes are let through because they are not someone managing a household: the
+-- household itself being deleted (its rows cascade away with it) and the user's account being
+-- deleted (blocking that would make an account impossible to close).
+create or replace function public.guard_household_owner() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE'
+     and (new.household_id <> old.household_id or new.user_id <> old.user_id) then
+    raise exception 'household_member.household_id and user_id cannot be changed'
+      using errcode = 'check_violation';
+  end if;
+
+  if old.role <> 'owner' or (tg_op = 'UPDATE' and new.role = 'owner') then
+    return case when tg_op = 'DELETE' then old else new end;
+  end if;
+
+  if tg_op = 'DELETE' and (
+       not exists (select 1 from public.household h where h.id = old.household_id)
+    or not exists (select 1 from auth.users u where u.id = old.user_id)
+  ) then
+    return old;
+  end if;
+
+  if not exists (
+    select 1 from public.household_member m
+    where m.household_id = old.household_id and m.user_id <> old.user_id and m.role = 'owner'
+  ) then
+    raise exception 'a household must keep at least one owner'
+      using errcode = 'check_violation',
+            hint = 'Make another member an owner first.';
+  end if;
+
+  return case when tg_op = 'DELETE' then old else new end;
+end $$;
+
+revoke execute on function public.guard_household_owner() from public, anon, authenticated;
+
+create trigger household_member_keep_owner
+  before update or delete on household_member
+  for each row execute function public.guard_household_owner();
 
 alter table household        enable row level security;
 alter table household_member enable row level security;
@@ -358,15 +416,18 @@ create policy recipe_ing_read on recipe_ingredient for select using (auth.role()
 -- ---------------------------------------------------------------------------
 -- new users get a household automatically
 -- ---------------------------------------------------------------------------
-create or replace function handle_new_user() returns trigger
+create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare h uuid;
 begin
-  insert into household default values returning id into h;
-  insert into household_member (household_id, user_id, role) values (h, new.id, 'owner');
+  insert into public.household default values returning id into h;
+  insert into public.household_member (household_id, user_id, role) values (h, new.id, 'owner');
   return new;
 end $$;
 
+-- Only ever run by the trigger below, which does not need the caller to hold execute.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row execute function handle_new_user();
+  for each row execute function public.handle_new_user();
