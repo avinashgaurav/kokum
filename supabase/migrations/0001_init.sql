@@ -64,6 +64,41 @@ create table household_member (
 
 create index on household_member (user_id);
 
+-- Invite codes. Joining a household is an owner handing someone a code, never a user writing
+-- their own membership row (RLS forbids that; see member_insert). The code is generated here,
+-- not by the client, so its strength does not depend on which app version issued it.
+--
+-- Alphabet is Crockford base32: no I, L, O or U, so a code read aloud or copied off a screen
+-- survives. 10 symbols at 5 bits each is 50 bits drawn from gen_random_uuid(), skipping the
+-- uuid's version and variant bytes so every bit used is random. 32 divides 256, so taking each
+-- byte mod 32 has no bias.
+create or replace function public.new_invite_code() returns text
+language sql volatile set search_path = '' as $$
+  select string_agg(
+           substr('0123456789ABCDEFGHJKMNPQRSTVWXYZ', get_byte(b, i) % 32 + 1, 1), '' order by i)
+  from (select uuid_send(gen_random_uuid()) as b) u,
+       unnest(array[0, 1, 2, 3, 4, 5, 9, 10, 11, 12]) as i;
+$$;
+
+-- It is the column default, so it runs as whoever inserts the invite.
+revoke execute on function public.new_invite_code() from public, anon;
+grant execute on function public.new_invite_code() to authenticated;
+
+create table household_invite (
+  code         text primary key default public.new_invite_code()
+               check (code ~ '^[0-9A-HJKMNP-TV-Z]{10}$'),
+  household_id uuid not null references household(id) on delete cascade,
+  -- Ownership is never handed out by code. Promoting someone is a deliberate owner action.
+  role         member_role not null default 'member' check (role <> 'owner'),
+  created_by   uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at   timestamptz not null default now(),
+  expires_at   timestamptz not null default (now() + interval '7 days'),
+  used_by      uuid references auth.users(id) on delete set null,
+  used_at      timestamptz
+);
+
+create index on household_invite (household_id);
+
 -- ---------------------------------------------------------------------------
 -- ingredient dictionary (global, read-only to clients)
 -- ---------------------------------------------------------------------------
@@ -262,13 +297,87 @@ create trigger pantry_item_touch
 -- policy. A plain subquery against household_member inside a household_member policy
 -- recurses; this breaks the cycle.
 -- ---------------------------------------------------------------------------
-create or replace function is_household_member(h uuid) returns boolean
+--
+-- Every security-definer function below names its objects with their schema and pins
+-- search_path, so a caller cannot shadow a table or function with one of their own. Execute
+-- is revoked from public and anon (Supabase grants it to both by default) and granted only to
+-- the role that needs it.
+-- ---------------------------------------------------------------------------
+create or replace function public.is_household_member(h uuid) returns boolean
 language sql security definer stable set search_path = public as $$
   select exists (
-    select 1 from household_member
-    where household_id = h and user_id = auth.uid()
+    select 1 from public.household_member m
+    where m.household_id = h and m.user_id = auth.uid()
   );
 $$;
+
+revoke execute on function public.is_household_member(uuid) from public, anon;
+grant execute on function public.is_household_member(uuid) to authenticated;
+
+-- Owner check for membership writes. Same security-definer pattern, for the same reason.
+create or replace function public.is_household_owner(h uuid) returns boolean
+language sql security definer stable set search_path = public as $$
+  select exists (
+    select 1 from public.household_member m
+    where m.household_id = h and m.user_id = auth.uid() and m.role = 'owner'
+  );
+$$;
+
+revoke execute on function public.is_household_owner(uuid) from public, anon;
+grant execute on function public.is_household_owner(uuid) to authenticated;
+
+-- A household must always have an owner. RLS decides WHO may change membership; this decides
+-- what no change may do: demote or remove the last owner, which would leave a household nobody
+-- can manage. It also pins a row to its household and user: moving a membership row is a
+-- delete and an insert, each checked by its own policy, never an update.
+--
+-- Two deletes are let through because they are not someone managing a household: the
+-- household itself being deleted (its rows cascade away with it) and the user's account being
+-- deleted (blocking that would make an account impossible to close).
+create or replace function public.guard_household_owner() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE'
+     and (new.household_id <> old.household_id or new.user_id <> old.user_id) then
+    raise exception 'household_member.household_id and user_id cannot be changed'
+      using errcode = 'check_violation';
+  end if;
+
+  if old.role <> 'owner' or (tg_op = 'UPDATE' and new.role = 'owner') then
+    return case when tg_op = 'DELETE' then old else new end;
+  end if;
+
+  -- Serialise owner removals per household. Without this, two owners leaving at the same
+  -- moment each see the other still there and both succeed, leaving no owner. The second
+  -- waits here until the first commits, and under read committed its check below then sees
+  -- the first one gone. When the household itself is being deleted its row is already gone,
+  -- so this locks nothing and the cascade proceeds.
+  perform 1 from public.household where id = old.household_id for update;
+
+  if tg_op = 'DELETE' and (
+       not exists (select 1 from public.household h where h.id = old.household_id)
+    or not exists (select 1 from auth.users u where u.id = old.user_id)
+  ) then
+    return old;
+  end if;
+
+  if not exists (
+    select 1 from public.household_member m
+    where m.household_id = old.household_id and m.user_id <> old.user_id and m.role = 'owner'
+  ) then
+    raise exception 'a household must keep at least one owner'
+      using errcode = 'check_violation',
+            hint = 'Make another member an owner first.';
+  end if;
+
+  return case when tg_op = 'DELETE' then old else new end;
+end $$;
+
+revoke execute on function public.guard_household_owner() from public, anon, authenticated;
+
+create trigger household_member_keep_owner
+  before update or delete on household_member
+  for each row execute function public.guard_household_owner();
 
 alter table household        enable row level security;
 alter table household_member enable row level security;
@@ -285,14 +394,92 @@ alter table ingredient       enable row level security;
 alter table ingredient_alias enable row level security;
 alter table recipe_ingredient enable row level security;
 
-create policy household_rw on household
-  for all using (is_household_member(id)) with check (is_household_member(id));
+-- Any member may read their household's profile; only an owner may change it. There is no
+-- insert or delete policy: a household is created by handle_new_user() at signup (security
+-- definer, so RLS does not apply to it) and is never deleted from the client.
+create policy household_read on household
+  for select using (is_household_member(id));
+create policy household_update on household
+  for update using (is_household_owner(id)) with check (is_household_owner(id));
 
 create policy member_read on household_member
   for select using (user_id = auth.uid() or is_household_member(household_id));
 
-create policy member_write on household_member
-  for all using (is_household_member(household_id)) with check (is_household_member(household_id));
+-- Only the household owner may add, change or remove membership rows. Any member (including
+-- the cook role) may remove their own row, which is how someone leaves a household. Without
+-- the role check, any member could add strangers, promote themselves, or delete the owner.
+create policy member_insert on household_member
+  for insert with check (is_household_owner(household_id));
+create policy member_update on household_member
+  for update using (is_household_owner(household_id)) with check (is_household_owner(household_id));
+create policy member_delete on household_member
+  for delete using (is_household_owner(household_id) or user_id = auth.uid());
+
+-- Invites: the owner of a household creates, lists and revokes its codes. Nobody else can read
+-- one, so a code cannot be harvested by listing the table; redeeming goes through
+-- join_household() below. There is no update policy: only that function marks a code used.
+--
+-- Column grants close the rest. A client may choose the household, the role and an earlier
+-- expiry, nothing else: the code, its creator and its used_by/used_at are always set by the
+-- database, so nobody can mint a guessable code or insert one pre-redeemed.
+alter table household_invite enable row level security;
+
+revoke all on household_invite from public, anon, authenticated;
+grant select, delete on household_invite to authenticated;
+grant insert (household_id, role, expires_at) on household_invite to authenticated;
+
+-- At most 20 open (unused, unexpired) codes per household. This is a trigger, not a check in
+-- the insert policy: a policy runs per row against a snapshot taken when the statement began,
+-- so a multi-row insert or two concurrent requests could each see 19 and all get through. The
+-- advisory lock serialises inserts per household until the transaction ends, and the count
+-- runs after the lock is held, so it sees rows inserted earlier in this statement and rows
+-- committed by whoever held the lock before.
+--
+-- A caller who is not an owner of the household is passed straight through, before the lock
+-- and the count, and the insert policy then rejects them. Otherwise a non-owner could probe
+-- whether a household is at the cap, or hold its lock.
+--
+-- That includes a caller with no auth.uid() at all, such as the service role, which also
+-- bypasses RLS: server-side inserts are not capped. Only clients are.
+--
+-- The lock uses the two-key form, with 1 as this lock's namespace, so it cannot collide with
+-- any other advisory lock keyed on a single bigint.
+create or replace function public.cap_open_invites() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not public.is_household_owner(new.household_id) then
+    return new;
+  end if;
+
+  perform pg_advisory_xact_lock(1, hashtext(new.household_id::text));
+
+  if (select count(*) from public.household_invite i
+      where i.household_id = new.household_id and i.used_at is null and i.expires_at > now()) >= 20
+  then
+    raise exception 'this household already has 20 open invite codes'
+      using errcode = 'check_violation',
+            hint = 'Revoke one, or wait for one to expire.';
+  end if;
+
+  return new;
+end $$;
+
+revoke execute on function public.cap_open_invites() from public, anon, authenticated;
+
+create trigger household_invite_cap
+  before insert on household_invite
+  for each row execute function public.cap_open_invites();
+
+create policy invite_read on household_invite
+  for select using (is_household_owner(household_id));
+create policy invite_insert on household_invite
+  for insert with check (
+    is_household_owner(household_id)
+    and expires_at > now()
+    and expires_at <= now() + interval '30 days'
+  );
+create policy invite_delete on household_invite
+  for delete using (is_household_owner(household_id));
 
 create policy pantry_rw on pantry_item
   for all using (is_household_member(household_id)) with check (is_household_member(household_id));
@@ -340,17 +527,78 @@ create policy alias_read on ingredient_alias for select using (auth.role() = 'au
 create policy recipe_ing_read on recipe_ingredient for select using (auth.role() = 'authenticated');
 
 -- ---------------------------------------------------------------------------
+-- joining a household by invite code
+--
+-- The caller is not a member yet, so member_insert would reject their own row. This function
+-- is the one door: it runs as the table owner, checks the code, and adds exactly the caller
+-- with exactly the role the owner chose. search_path is empty and every object is qualified.
+--
+-- Input is normalised the Crockford way (case-folded, spaces and hyphens dropped, O read as 0,
+-- I and L as 1), so a code typed off a screen still works. A missing, expired, used or orphaned
+-- code all get the same error, so the function does not tell a guesser which codes exist. Already being
+-- a member is an error and leaves the code unused. The row lock stops two people redeeming one
+-- code at the same moment.
+-- ---------------------------------------------------------------------------
+create or replace function public.join_household(p_code text) returns uuid
+language plpgsql security definer volatile set search_path = '' as $$
+declare
+  v_uid  uuid := auth.uid();
+  v_code text;
+  v_inv  public.household_invite%rowtype;
+begin
+  if v_uid is null then
+    raise exception 'sign in to join a household' using errcode = 'insufficient_privilege';
+  end if;
+
+  v_code := translate(upper(regexp_replace(coalesce(p_code, ''), '[\s-]', '', 'g')), 'OIL', '011');
+
+  select * into v_inv from public.household_invite i where i.code = v_code for update;
+
+  -- A code is only as good as the owner who issued it: if they have since stopped being an
+  -- owner of that household, so has the code.
+  if not found or v_inv.used_at is not null or v_inv.expires_at <= now() or not exists (
+       select 1 from public.household_member m
+       where m.household_id = v_inv.household_id and m.user_id = v_inv.created_by
+         and m.role = 'owner'
+     ) then
+    raise exception 'invite code is not valid' using errcode = 'invalid_parameter_value';
+  end if;
+
+  if exists (
+    select 1 from public.household_member m
+    where m.household_id = v_inv.household_id and m.user_id = v_uid
+  ) then
+    raise exception 'already a member of this household' using errcode = 'unique_violation';
+  end if;
+
+  insert into public.household_member (household_id, user_id, role)
+  values (v_inv.household_id, v_uid, v_inv.role);
+
+  update public.household_invite
+     set used_by = v_uid, used_at = now()
+   where code = v_inv.code;
+
+  return v_inv.household_id;
+end $$;
+
+revoke execute on function public.join_household(text) from public, anon;
+grant execute on function public.join_household(text) to authenticated;
+
+-- ---------------------------------------------------------------------------
 -- new users get a household automatically
 -- ---------------------------------------------------------------------------
-create or replace function handle_new_user() returns trigger
+create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare h uuid;
 begin
-  insert into household default values returning id into h;
-  insert into household_member (household_id, user_id, role) values (h, new.id, 'owner');
+  insert into public.household default values returning id into h;
+  insert into public.household_member (household_id, user_id, role) values (h, new.id, 'owner');
   return new;
 end $$;
 
+-- Only ever run by the trigger below, which does not need the caller to hold execute.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row execute function handle_new_user();
+  for each row execute function public.handle_new_user();

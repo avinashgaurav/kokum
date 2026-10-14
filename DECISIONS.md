@@ -92,7 +92,7 @@ Chosen from ten premium marks in the Route B language (jar, bowl, tapered vessel
 split circle, lid, measuring cup, gauge ring, five of six, moon-phase fill).
 
 **Open risk to resolve in production art:** a segmented ring is one visual step away from a
-loading spinner. Mitigations to test before shipping, in `UI-UX.md` §4.
+loading spinner. Mitigations are still to be written up; tracked as open question Q-01.
 
 ---
 
@@ -105,15 +105,15 @@ Three beats naming the three tabs, which makes it descriptive and immediately cl
 honestly at decision time: it explains the app rather than making someone want it, so the
 marketing site and store screenshots have to carry the desire that the line does not.
 
-Useful consequence: the three beats and the icon can reinforce each other. See the open
-question in `UI-UX.md` §4 about reducing the mark from six segments to three.
+Useful consequence: the three beats and the icon can reinforce each other. See open
+question Q-01 about reducing the mark from six segments to three.
 
 ---
 
 ## D-008 · Stack: Expo, TypeScript, React Native, local-first SQLite
 **Date:** 2026-08-07 · **Status:** Locked
 
-Matches the working setup in `~/Desktop/Personal/VehicleX/app/`. Local-first via `expo-sqlite`;
+Matches the owner's existing working Expo setup from an earlier app. Local-first via `expo-sqlite`;
 the app must be fully usable with no network. Cloud sync is opt-in and only needed for household
 sharing.
 
@@ -164,8 +164,8 @@ same parser.
 
 ---
 
-## D-011 · Model: claude-opus-5
-**Date:** 2026-08-07 · **Status:** Locked
+## D-011 · Model: claude-opus-5-5
+**Date:** 2026-08-07, revised 2026-10-14 · **Status:** Locked
 
 Used for three things: parsing captures, reranking and explaining suggestions, and mapping
 free-text moods onto tags.
@@ -177,6 +177,15 @@ are used everywhere, so the shape is guaranteed and only the meaning needs re-va
 The API key lives in the device keychain and is entered by the user. That is right for a
 personal app and wrong for a multi-tenant product, which would proxy through a server holding
 one key. `src/ai/client.ts` is the seam where that proxy goes.
+
+**2026-10-14:** moved from `claude-opus-5` (still a valid id) to `claude-opus-5-5`, the current
+Opus. Same 1M context and feature set, cheaper per token ($4 / $20 per million against $5 / $25).
+None of its breaking changes touch this code: no call sets `thinking`, forces `tool_choice`, or
+uses computer use. One behaviour to know: its default effort is `medium`, one below Opus 5.
+Sonnet 5.5 ($2 / $10) was considered and not taken. The reasoning above still holds: volume is
+one parse per capture and one rerank per state change, the key is the user's own, and parse
+accuracy on handwritten lists and Hinglish bills is where a mistake costs trust. Revisit once
+the AI layer has an eval that can show Sonnet holding quality.
 
 ---
 
@@ -204,3 +213,130 @@ would mean the app is only trustworthy for people who do not keep any.
 
 Closed since the last revision: Q-03 (OCR path, answered by Claude vision), Q-04 (brand line,
 folded into the tagline decision).
+
+---
+
+## D-013 · Membership writes are owner-only
+**Date:** 2026-10-14 · **Status:** Locked
+
+The original `member_write` policy let any household member, including the `cook` role, insert,
+update or delete any membership row, including the owner's. It is replaced by three policies:
+insert and update require the `owner` role (via `is_household_owner`), and delete is allowed for
+the owner or for a member removing their own row, which is how someone leaves a household.
+Reading is unchanged.
+
+Fixed in place in `0001_init.sql` because the migration has never been applied to a live
+project. Consequence: `joinHousehold` in `app/src/db/supabase.ts`, which inserts the caller's
+own row, was already rejected by RLS (the caller is not yet a member) and still is. Joining
+needs an owner-issued invite, for example a security-definer RPC that redeems an invite code.
+Not built yet.
+
+Also hardened in place: the security-definer helpers are schema-qualified and executable by
+`authenticated` only, and a `household_member_keep_owner` trigger refuses removing or demoting
+a household's last owner, or changing a row's `household_id` or `user_id`.
+
+---
+
+## D-014 · Joining a household is by owner-issued invite code
+**Date:** 2026-10-14 · **Status:** Locked
+
+Closes the gap D-013 left open. An owner creates a row in `household_invite`; whoever redeems
+the code through `public.join_household(code)` is added as a member with the role the owner
+chose. The old flow, typing the household's uuid and inserting your own membership row, is gone.
+
+- **The database makes the code.** Ten Crockford base32 symbols (no I, L, O or U), 50 bits from
+  `gen_random_uuid()`. Column grants let a client set only the household, the role and an
+  earlier expiry, so nobody can mint a guessable code or insert one already redeemed.
+- **One use, 7 days by default, 30 at most, never already expired.** `owner` is never
+  grantable by code. A household holds at most 20 open (unused, unexpired) codes at once,
+  enforced by a locking insert trigger since D-015 (originally an RLS check, which raced).
+- **Only the owner sees a household's codes.** Nobody else can read the table, so codes cannot
+  be listed; redemption goes only through the RPC.
+- **The RPC is the one door.** Security definer, empty `search_path`, everything
+  schema-qualified, executable by `authenticated` only. Unknown, expired, used and orphaned
+  codes (issuer no longer an owner) get the same error, so it confirms nothing to a guesser.
+  Already being a member is a separate error and leaves the code unused. A row lock stops two
+  people redeeming one code at once.
+- **The client normalises the same way** (`app/src/db/inviteCode.ts`), so `qy7nw-ltc8s` works
+  and a pasted uuid is caught before a round trip.
+
+**Joining never moves you.** A user who joins keeps the household created at signup, and the
+phone stays on it until they choose otherwise. The active household is a per-device choice in
+AsyncStorage (`app/src/db/households.ts`), defaulting to the user's own household (the
+earliest one they own). After a successful join, Settings asks before switching. (As first
+written, switching merged this phone's pantry into the joined one; since D-015 each household's
+pantry is kept apart and the joined one is pulled, never merged into.) A switcher lists every household
+the account belongs to, and "Leave this household" deletes the user's own membership row, which
+the last-owner trigger still refuses for a sole owner. A per-device choice rather than a profile
+column because what a phone syncs with is a property of that phone.
+
+**Throttling.** Redemption has no rate limit of its own. It relies on Supabase's API rate limits
+plus 50-bit codes that expire in 7 days, which together make guessing impractical. Not built: a
+screen to list or revoke codes, which RLS already allows.
+
+Verified with PGlite against a stub `auth` schema, as role `authenticated` with RLS on:
+37 checks covering invite, join, used, expired and demoted-owner codes, expiry at insert, the
+20-code cap, the cook role and the last-owner guard. Still
+not applied to a live Supabase project (Q-06). **Revised by D-015:** the cap moved to a
+trigger, and the harness, now committed at `supabase/tests/rls.mjs`, runs 54 checks.
+
+---
+
+## D-015 · Race-safe invite cap and owner guard; household rows owner-written; pantries scoped per household
+**Date:** 2026-10-14 · **Status:** Locked
+
+A review found four problems in D-013 and D-014. All are fixed in place in `0001_init.sql`,
+which is still allowed because it has never been applied to a live project (Q-06).
+
+- **The 20-code cap was bypassable.** It was a `stable` function called from the insert
+  policy, which counts against the statement's snapshot: a multi-row insert or two concurrent
+  requests could each see 19 open codes. It is now a `before insert` trigger,
+  `household_invite_cap`, that takes `pg_advisory_xact_lock(hashtext(household_id))` and then
+  counts, so inserts for one household queue and each sees the last. The trigger lets a
+  non-owner through untouched, before the lock, so the insert policy rejects them with the
+  same error whatever the household's count: the cap is no oracle, and `open_invite_count()`,
+  which any signed-in user could call for any household, is gone. Expiry and ownership stay
+  in RLS.
+- **Two owners leaving at once could leave none.** `guard_household_owner()` now locks the
+  household row (`for update`) before counting the other owners, so the second removal waits
+  for the first and then sees it. A cascade from deleting the household finds no row to lock
+  and goes through as before.
+- **Any member, including a cook, could rewrite or delete the household row.** `household_rw`
+  (`for all`) is replaced by `household_read` (select, members) and `household_update` (update,
+  owners). There is no client insert or delete: `handle_new_user()` creates the household at
+  signup as security definer, and nothing in the app inserts or deletes household rows.
+- **Switching household merged one pantry into another.** The local pantry and profile now
+  belong to one household (`householdId` in local state). Switching puts them aside in a
+  per-household `stash` and restores the target's copy, or empties the pantry and pulls the
+  target's when the phone has none; leaving a household drops its copy. A sync refuses to run
+  against any household but the one the pantry belongs to, and the reducer discards a result
+  that lands after the phone has moved. Cook-log entries carry the household they were cooked
+  in and only sync there. The profile is pushed only by owners' phones (with two owners, the
+  last to sync wins); everyone else's takes the household's copy on each sync.
+- **Follow-up from re-review.** Meals cooked before the first sync are stamped with the
+  household the phone was on when it switches, so they never follow it to a shared one; one
+  helper, `cookLogHousehold`, holds the rule. An unbound pantry, including one from an older
+  build, may only be pushed to the user's own household; on any other it is put aside under
+  their own and the active one is pulled (`alignLocalHousehold`, with `maySyncWith` as the
+  backstop in sync). Merges an older build already made cannot be undone. The profile push now
+  sends `max_minutes_weekday` and `max_minutes_weekend`, which the pull already read, so a pull
+  no longer resets them. A pull merges onto local edits rather than replacing them, a failed
+  profile upload is reported without failing the sync, stale stash entries are dropped, and
+  the cap lock uses the two-key form `pg_advisory_xact_lock(1, hashtext(...))`. The cap does
+  not apply with no `auth.uid()` (the service role), by design.
+
+Smaller fixes in the same pass: "Leave this household" asks first; the household switcher,
+invite and join buttons ignore taps while a request is in flight; `pickActiveHousehold` sorts
+an unparseable `joinedAt` last; `currentSession` reports a failed membership query instead of
+it reading as "No household yet".
+
+The PGlite harness is now in the repo at `supabase/tests/rls.mjs`: 54 checks, adding a
+multi-row insert past the cap, the cap's error never reaching a non-owner, the advisory lock
+and the household row lock (read from `pg_locks`; PGlite is one connection, so real
+concurrency is not exercised), the four household policies, and cascade and account deletion
+past the owner guard, and the uncapped service-role path.
+
+**From here on, schema changes go in new migration files** (`0003_...sql` and later), never
+edits to `0001_init.sql`. Editing in place was only defensible while nothing had been applied;
+the first time a live project runs the migrations, that stops being true, and it is simplest
+to stop now.

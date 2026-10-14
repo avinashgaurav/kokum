@@ -10,7 +10,7 @@ Kokum's entire reason to exist is that it does not lie to you about your own kit
 > Every dish's state is computed by deterministic code in `src/engine/dishState.ts`,
 > **never by the language model.**
 
-The LLM layer in `src/engine/rerank.ts` may rank, explain, substitute and converse. It may
+The LLM layer in `src/ai/rerank.ts` may rank, explain, substitute and converse. It may
 never compute a dish's state and it may never edit a missing-item list.
 
 ### The three states
@@ -33,7 +33,7 @@ never compute a dish's state and it may never edit a missing-item list.
 Hard constraints (diet, allergy, equipment, fasting calendar) apply to **both**. A pull may
 surface a dish you lack ingredients for. It may never surface one you must not eat.
 
-If you touch `dishState.ts`, `confidence.ts` or `rerank.ts`, state in your PR which invariant
+If you touch `dishState.ts`, `confidence.ts` or `ai/rerank.ts`, state in your PR which invariant
 each change preserves, and flag it loudly. When unsure, round toward asking the user.
 
 ## Honesty discipline
@@ -77,8 +77,7 @@ All three must pass. Beyond that, specific to this product:
 - Consume semantic tokens from `src/theme`. Never hard-code colours. Green and amber belong to
   the state system only and are never used decoratively.
 - Native modules that break Expo Go must be lazy-loaded behind a guarded `require` inside the
-  function, so the app still runs in Expo Go. See the pattern in
-  `~/Desktop/Personal/VehicleX/app/src/utils/reminders.ts`.
+  function, so the app still runs in Expo Go.
 - `android/` and `ios/` are `expo prebuild` output and are gitignored. Never commit them.
 - Hinglish is first-class. Ingredient search must match *dhaniya* and *coriander* equally. The
   alias table backs the UI, not just the engine.

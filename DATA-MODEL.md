@@ -28,8 +28,12 @@ exists for.
 AsyncStorage, one JSON blob under `kokum.state.v1`, written after every state change:
 
 ```ts
-{ household, pantry: PantryItem[], cookLog, leftovers }
+{ household, pantry: PantryItem[], cookLog, leftovers, householdId, needsPull, stash }
 ```
+
+`householdId` is the shared household the pantry and profile belong to (null until the first
+sync). `stash` holds this phone's copy of every other household it has been on, so switching
+households swaps the pantry instead of merging it (DECISIONS D-015).
 
 The pantry is a `Map` in memory and an array on disk. Corrupt or unreadable storage falls
 through to the seed pantry rather than a blank app, and a failed write never takes the session
@@ -66,6 +70,7 @@ quantities are never subtracted.
 |---|---|
 | `household` | Covers, cooktop, diet, allergies, equipment, observances, budget |
 | `household_member` | The join. Roles: owner, member, cook. |
+| `household_invite` | One-use codes an owner issues; redeemed only through `join_household()` |
 | `ingredient` | Global dictionary, read-only to clients |
 | `ingredient_alias` | What turns three spellings into one row you can do arithmetic on |
 | `recipe`, `recipe_ingredient` | `household_id` null for the shared corpus |
@@ -125,8 +130,22 @@ phone:
 
 1. Pull remote rows; anything strictly newer than the local row replaces it
 2. Push the merged set back, upserting on (household, ingredient)
-3. Push the household profile, so both phones suggest the same dishes
-4. Upsert recent cook-log entries, ignoring duplicates
+3. The household profile is shared so both phones suggest the same dishes, and only owners
+   may change it: every owner's phone pushes it (with two owners, whichever syncs last wins),
+   and every other phone takes the household's copy. A failed profile upload is reported
+   without failing the pantry sync
+4. Upsert recent cook-log entries cooked in this household, ignoring duplicates
+
+A sync only ever runs against the household the local pantry belongs to. Right after switching
+to a household this phone holds no copy of, it pulls only (pantry and profile, merged onto
+anything entered since the switch) and pushes nothing. A result that lands after the phone has
+switched again is discarded.
+
+An unbound pantry (never synced, or carried over from a build before this tracking existed) is
+the user's own. It may only be pushed to their own household; if the phone is on any other, the
+pantry and its cook log are put aside under the user's own household and the active one is
+pulled. **Limitation:** an older build already merged its pantry into whichever household it
+synced with. Those merges are on the server and cannot be undone from here.
 
 Ties keep the local row, which stops a no-op sync from churning state and re-rendering every
 screen. A failed sync returns an error and leaves the local pantry untouched.

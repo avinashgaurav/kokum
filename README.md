@@ -32,7 +32,21 @@ npm run verify     # tsc --noEmit, then the engine test suite
 npx expo export --platform android --output-dir dist && rm -rf dist
 ```
 
-Current status: typecheck clean, **48 of 48 engine tests passing**, Metro bundles 1135 modules.
+The SQL checks run the migration in PGlite (Postgres in WASM) as the `authenticated` role:
+
+```bash
+cd supabase/tests && npm install && npm test && rm -rf node_modules
+```
+
+Current status: typecheck clean, **73 of 73 tests passing**, **54 of 54 SQL checks passing**,
+Metro bundles 1138 modules.
+
+## Status
+
+Pre-release. Not yet run on a physical device. The AI layer (parsing, reranking, mood) has no
+eval yet; only the deterministic engine is tested. Joining a shared household now works by
+owner-issued invite code (DECISIONS D-014), checked against the migration in PGlite. The
+Supabase migration has still not been applied to a live project. Details under Known gaps below.
 
 ## The one rule
 
@@ -86,7 +100,7 @@ pantry unreviewed. Detail in [AI-ENGINE.md](AI-ENGINE.md).
 ## Layout
 
 ```
-Guess/
+kokum/
   AGENTS.md            rules for anyone, human or model, changing this
   DECISIONS.md         every locked decision with its reasoning
   INVENTORY.md         the depletion and confidence model
@@ -94,6 +108,7 @@ Guess/
   INTEGRATIONS.md      what is actually possible with Zepto, Blinkit, Swiggy and Zomato
   DATA-MODEL.md        local store, Supabase schema, sync rules, privacy
   supabase/migrations/ schema with row-level security, plus generated seed data
+  supabase/tests/      PGlite checks of the RLS policies, triggers and join_household()
   app/
     src/
       engine/          deterministic core. No React, no I/O, fully testable.
@@ -104,7 +119,7 @@ Guess/
         cook.ts          the four depletion events
         plan.ts          weekly plan, leftovers, guest mode
         insights.ts      nutrition, spend and waste for the week
-        __tests__/       48 invariant tests
+        __tests__/       48 invariant tests, 25 invite, household and sync tests
       ai/              Claude: parsing, reranking, mood interpretation
       db/              Supabase client and pantry sync
       data/            ingredient dictionary (37), recipe corpus (14, all verified)
@@ -130,8 +145,9 @@ for. `npm run icons` regenerates every size from the vector.
 
 - **Nothing has been tested on a physical device.** The deep-link URL schemes in
   `integrations/order.ts` all carry `[VERIFY]` and have never been tapped on a real handset.
-- **The Supabase migration has never been applied to a live project.** The RLS policies are
-  written and reviewed, and unverified in practice.
+- **The Supabase migration has never been applied to a live project.** The RLS policies and
+  the invite flow are written, reviewed and exercised in PGlite as the `authenticated` role,
+  and unverified against real Supabase.
 - **Persistence is AsyncStorage, not SQLite.** Fine at 40 pantry rows, wrong at 400.
 - **The recipe corpus is 14 dishes.** Enough to prove the engine, nowhere near enough to use
   daily. Getting to ~500 without flipping `verified` in bulk is the next real milestone.

@@ -2,6 +2,11 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+import { formatInviteCode, parseInviteCode } from './inviteCode';
+import { pickActiveHousehold, type MemberRole, type Membership } from './households';
+
+export type { MemberRole, Membership } from './households';
+
 /**
  * Supabase, used for one thing: letting more than one person share a pantry.
  *
@@ -39,10 +44,20 @@ export function getSupabase(): SupabaseClient | null {
   return client;
 }
 
+const ACTIVE_KEY = 'kokum.activeHousehold';
+
 export interface CloudSession {
   userId: string;
   email: string | null;
+  /** The household this phone syncs with. See households.ts for how it is chosen. */
   householdId: string | null;
+  role: MemberRole | null;
+  households: Membership[];
+  /**
+   * Set when the membership query failed. The households list is then empty because it could
+   * not be read, not because there are none, and callers must say so rather than "no household".
+   */
+  error: string | null;
 }
 
 export async function currentSession(): Promise<CloudSession | null> {
@@ -55,17 +70,70 @@ export async function currentSession(): Promise<CloudSession | null> {
 
   // A trigger on auth.users creates a household and membership row for every new signup,
   // so this is populated by the time the first sign-in completes.
-  const { data: rows } = await sb
+  const { data: rows, error } = await sb
     .from('household_member')
-    .select('household_id')
-    .eq('user_id', user.id)
-    .limit(1);
+    .select('household_id, role, joined_at, household(name)')
+    .eq('user_id', user.id);
+
+  const households: Membership[] = (rows ?? []).map((r) => {
+    const h = r.household as { name?: string } | { name?: string }[] | null;
+    const name = (Array.isArray(h) ? h[0]?.name : h?.name) ?? 'Household';
+    return { householdId: r.household_id, name, role: r.role as MemberRole, joinedAt: r.joined_at };
+  });
+
+  let stored: string | null = null;
+  try {
+    stored = await AsyncStorage.getItem(ACTIVE_KEY);
+  } catch {
+    // Unreadable storage falls back to the user's own household, which is the safe default.
+  }
+  const householdId = pickActiveHousehold(households, stored);
 
   return {
     userId: user.id,
     email: user.email ?? null,
-    householdId: rows?.[0]?.household_id ?? null,
+    householdId,
+    role: households.find((m) => m.householdId === householdId)?.role ?? null,
+    households,
+    error: error ? error.message : null,
   };
+}
+
+/** Makes this phone sync with another of the user's households. Never called implicitly. */
+export async function setActiveHousehold(householdId: string): Promise<void> {
+  await AsyncStorage.setItem(ACTIVE_KEY, householdId);
+}
+
+/**
+ * Removes the signed-in user from a household. RLS allows anyone to delete their own row; the
+ * database refuses it when they are the last owner, so a household is never left unmanaged.
+ */
+export async function leaveHousehold(householdId: string): Promise<{ ok: boolean; message: string }> {
+  const sb = getSupabase();
+  if (!sb) return { ok: false, message: 'Sharing is not configured in this build.' };
+
+  const { data } = await sb.auth.getSession();
+  const user = data.session?.user;
+  if (!user) return { ok: false, message: 'Sign in first.' };
+
+  const { error } = await sb
+    .from('household_member')
+    .delete()
+    .eq('household_id', householdId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    if (error.code === '23514') {
+      return { ok: false, message: 'You are its only owner. Make someone else an owner first.' };
+    }
+    return { ok: false, message: 'Could not leave. Try again.' };
+  }
+  try {
+    if ((await AsyncStorage.getItem(ACTIVE_KEY)) === householdId) await AsyncStorage.removeItem(ACTIVE_KEY);
+  } catch {
+    // A stale choice is harmless: pickActiveHousehold ignores households the user has left.
+  }
+  return { ok: true, message: 'Left. This phone is back on your own household and its pantry.' };
 }
 
 /**
@@ -85,23 +153,65 @@ export async function signOut(): Promise<void> {
   await getSupabase()?.auth.signOut();
 }
 
-/** Adds the signed-in user to an existing household, so two phones share one pantry. */
-export async function joinHousehold(householdId: string): Promise<{ ok: boolean; message: string }> {
+export interface Invite {
+  /** Display form, e.g. QY7NW-1TC8S. */
+  code: string;
+  expiresAt: string;
+}
+
+/**
+ * Owner only: issues a one-use code that adds whoever redeems it to this household with the
+ * given role. The database generates the code and the expiry (7 days); RLS rejects anyone who
+ * is not an owner of the household, and a check constraint rejects inviting an owner.
+ */
+export async function createInvite(
+  householdId: string,
+  role: Exclude<MemberRole, 'owner'>,
+): Promise<{ ok: true; invite: Invite } | { ok: false; message: string }> {
   const sb = getSupabase();
   if (!sb) return { ok: false, message: 'Sharing is not configured in this build.' };
 
-  const { data } = await sb.auth.getSession();
-  const user = data.session?.user;
-  if (!user) return { ok: false, message: 'Sign in first.' };
+  const { data, error } = await sb
+    .from('household_invite')
+    .insert({ household_id: householdId, role })
+    .select('code, expires_at')
+    .single();
 
-  const { error } = await sb
-    .from('household_member')
-    .insert({ household_id: householdId, user_id: user.id, role: 'member' });
+  if (error || !data) {
+    return { ok: false, message: 'Could not create an invite. Only the household owner can.' };
+  }
+  return { ok: true, invite: { code: formatInviteCode(data.code), expiresAt: data.expires_at } };
+}
+
+/**
+ * Redeems an owner-issued invite code, so two phones can share one pantry. The caller cannot
+ * insert their own membership row (RLS forbids it); `join_household` checks the code and adds
+ * them with the role the owner chose.
+ */
+export async function joinHousehold(
+  input: string,
+): Promise<{ ok: boolean; message: string; householdId?: string }> {
+  const sb = getSupabase();
+  if (!sb) return { ok: false, message: 'Sharing is not configured in this build.' };
+
+  const code = parseInviteCode(input);
+  if (!code) return { ok: false, message: 'That is not an invite code. It has 10 letters and digits.' };
+
+  const { data } = await sb.auth.getSession();
+  if (!data.session?.user) return { ok: false, message: 'Sign in first.' };
+
+  const { data: joined, error } = await sb.rpc('join_household', { p_code: code });
 
   if (error) {
-    // The most common cause by far is a mistyped or stale id, which RLS turns into a
-    // permission error rather than a not-found. Say the useful thing, not the literal one.
-    return { ok: false, message: 'Could not join. Check the household code and try again.' };
+    // The server gives one answer for unknown, expired and used codes on purpose, so this
+    // can only say what to do next, not which of the three it was.
+    if (error.code === '23505') return { ok: false, message: 'You are already in that household.' };
+    return {
+      ok: false,
+      message: 'That code did not work. Codes last 7 days and work once; ask for a new one.',
+    };
   }
-  return { ok: true, message: 'Joined. Your pantries are now shared.' };
+  // Joining does not switch this phone over. The caller asks first: switching changes which
+  // pantry every screen syncs with.
+  return { ok: true, message: 'Joined.', householdId: joined as string };
 }

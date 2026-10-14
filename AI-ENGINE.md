@@ -63,7 +63,7 @@ not reshuffle on re-render, and it returns `null` rather than something uncookab
 
 ## Layer 2: Claude
 
-Model: `claude-opus-5`. Three uses, all optional, all degrading to nothing.
+Model: `claude-opus-5-5` (see DECISIONS D-011). Three uses, all optional, all degrading to nothing.
 
 ### Parsing (`src/ai/parse.ts`)
 
