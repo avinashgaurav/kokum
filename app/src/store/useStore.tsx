@@ -4,7 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { CookLogEntry, Household, Leftover, PantryItem, Recipe } from '../engine/types';
 import { INGREDIENT_INDEX } from '../data/ingredients';
 import { applyCook, confirmItem, restock } from '../engine/cook';
-import { commitSync, switchLocalHousehold, type ScopedLocal } from '../db/households';
+import {
+  alignLocalHousehold,
+  commitSync,
+  switchLocalHousehold,
+  type Membership,
+  type ScopedLocal,
+} from '../db/households';
 
 const KEY = 'kokum.state.v1';
 
@@ -100,6 +106,7 @@ type Action =
   | { type: 'eat-leftover'; id: string }
   | { type: 'bin-leftover'; id: string }
   | { type: 'switch-household'; to: string; from: string | null; drop?: string }
+  | { type: 'align-household'; active: string; memberships: Membership[] }
   | {
       type: 'synced';
       householdId: string;
@@ -113,6 +120,7 @@ const scoped = (s: AppState): ScopedLocal => ({
   pantry: s.pantry,
   household: s.household,
   stash: s.stash,
+  cookLog: s.cookLog,
 });
 
 function reducer(state: AppState, action: Action): AppState {
@@ -188,17 +196,17 @@ function reducer(state: AppState, action: Action): AppState {
         ...switchLocalHousehold(scoped(state), action.to, { from: action.from, drop: action.drop }),
       };
 
+    case 'align-household': {
+      const current = scoped(state);
+      const next = alignLocalHousehold(current, action.active, action.memberships);
+      return next === current ? state : { ...state, ...next };
+    }
+
     case 'synced': {
       // Null when the phone moved to another household while the sync was in flight: the
       // result belongs to the old one and must not land in the new one.
       const next = commitSync(scoped(state), action);
-      if (!next) return state;
-      return {
-        ...state,
-        ...next,
-        // The first sync binds this phone's history to the household it synced with.
-        cookLog: state.cookLog.map((e) => (e.householdId ? e : { ...e, householdId: action.householdId })),
-      };
+      return next ? { ...state, ...next } : state;
     }
   }
 }

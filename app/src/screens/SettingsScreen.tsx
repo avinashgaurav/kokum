@@ -269,13 +269,13 @@ function SharingCard() {
   }, []);
 
   // The local pantry belongs to one household. If this phone is now on another one (it left,
-  // or was removed), put the old one aside and bring this one's up before anything syncs.
+  // was removed, or an unbound pantry from an older build meets a joined household), put the
+  // local copy aside under the household it belongs to before anything syncs.
   useEffect(() => {
-    const active = session?.householdId;
-    if (active && state.householdId && state.householdId !== active) {
-      dispatch({ type: 'switch-household', to: active, from: state.householdId });
+    if (session?.householdId && !session.error) {
+      dispatch({ type: 'align-household', active: session.householdId, memberships: session.households });
     }
-  }, [session?.householdId, state.householdId, dispatch]);
+  }, [session, state.householdId, dispatch]);
 
   // A household this phone holds no copy of starts empty; fill it straight away.
   useEffect(() => {

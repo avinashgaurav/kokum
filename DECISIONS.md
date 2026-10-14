@@ -248,7 +248,8 @@ chose. The old flow, typing the household's uuid and inserting your own membersh
   `gen_random_uuid()`. Column grants let a client set only the household, the role and an
   earlier expiry, so nobody can mint a guessable code or insert one already redeemed.
 - **One use, 7 days by default, 30 at most, never already expired.** `owner` is never
-  grantable by code. A household holds at most 20 open (unused, unexpired) codes at once.
+  grantable by code. A household holds at most 20 open (unused, unexpired) codes at once,
+  enforced by a locking insert trigger since D-015 (originally an RLS check, which raced).
 - **Only the owner sees a household's codes.** Nobody else can read the table, so codes cannot
   be listed; redemption goes only through the RPC.
 - **The RPC is the one door.** Security definer, empty `search_path`, everything
@@ -262,8 +263,9 @@ chose. The old flow, typing the household's uuid and inserting your own membersh
 **Joining never moves you.** A user who joins keeps the household created at signup, and the
 phone stays on it until they choose otherwise. The active household is a per-device choice in
 AsyncStorage (`app/src/db/households.ts`), defaulting to the user's own household (the
-earliest one they own). After a successful join, Settings asks before switching and warns that
-the next sync merges this phone's pantry into the joined one. A switcher lists every household
+earliest one they own). After a successful join, Settings asks before switching. (As first
+written, switching merged this phone's pantry into the joined one; since D-015 each household's
+pantry is kept apart and the joined one is pulled, never merged into.) A switcher lists every household
 the account belongs to, and "Leave this household" deletes the user's own membership row, which
 the last-owner trigger still refuses for a sole owner. A per-device choice rather than a profile
 column because what a phone syncs with is a property of that phone.
@@ -276,7 +278,7 @@ Verified with PGlite against a stub `auth` schema, as role `authenticated` with 
 37 checks covering invite, join, used, expired and demoted-owner codes, expiry at insert, the
 20-code cap, the cook role and the last-owner guard. Still
 not applied to a live Supabase project (Q-06). **Revised by D-015:** the cap moved to a
-trigger, and the harness, now committed at `supabase/tests/rls.mjs`, runs 53 checks.
+trigger, and the harness, now committed at `supabase/tests/rls.mjs`, runs 54 checks.
 
 ---
 
@@ -309,19 +311,30 @@ which is still allowed because it has never been applied to a live project (Q-06
   target's when the phone has none; leaving a household drops its copy. A sync refuses to run
   against any household but the one the pantry belongs to, and the reducer discards a result
   that lands after the phone has moved. Cook-log entries carry the household they were cooked
-  in and only sync there. The profile is pushed only by an owner's phone; everyone else's
-  takes the household's copy on each sync.
+  in and only sync there. The profile is pushed only by owners' phones (with two owners, the
+  last to sync wins); everyone else's takes the household's copy on each sync.
+- **Follow-up from re-review.** Meals cooked before the first sync are stamped with the
+  household the phone was on when it switches, so they never follow it to a shared one; one
+  helper, `cookLogHousehold`, holds the rule. An unbound pantry, including one from an older
+  build, may only be pushed to the user's own household; on any other it is put aside under
+  their own and the active one is pulled (`alignLocalHousehold`, with `maySyncWith` as the
+  backstop in sync). Merges an older build already made cannot be undone. The profile push now
+  sends `max_minutes_weekday` and `max_minutes_weekend`, which the pull already read, so a pull
+  no longer resets them. A pull merges onto local edits rather than replacing them, a failed
+  profile upload is reported without failing the sync, stale stash entries are dropped, and
+  the cap lock uses the two-key form `pg_advisory_xact_lock(1, hashtext(...))`. The cap does
+  not apply with no `auth.uid()` (the service role), by design.
 
 Smaller fixes in the same pass: "Leave this household" asks first; the household switcher,
 invite and join buttons ignore taps while a request is in flight; `pickActiveHousehold` sorts
 an unparseable `joinedAt` last; `currentSession` reports a failed membership query instead of
 it reading as "No household yet".
 
-The PGlite harness is now in the repo at `supabase/tests/rls.mjs`: 53 checks, adding a
+The PGlite harness is now in the repo at `supabase/tests/rls.mjs`: 54 checks, adding a
 multi-row insert past the cap, the cap's error never reaching a non-owner, the advisory lock
 and the household row lock (read from `pg_locks`; PGlite is one connection, so real
 concurrency is not exercised), the four household policies, and cascade and account deletion
-past the owner guard.
+past the owner guard, and the uncapped service-role path.
 
 **From here on, schema changes go in new migration files** (`0003_...sql` and later), never
 edits to `0001_init.sql`. Editing in place was only defensible while nothing had been applied;

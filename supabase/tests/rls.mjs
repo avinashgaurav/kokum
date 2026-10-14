@@ -173,12 +173,20 @@ ok(fnGone && capExec === false, 'no callable invite-count function for clients')
 await as(A, () => db.query('delete from household_invite where code = (select code from household_invite where household_id = $1 and used_at is null and expires_at > now() limit 1)', [HA]));
 const advisory = await as(A, () => db.transaction(async (tx) => {
   await tx.query(`insert into household_invite (household_id) values ($1)`, [HA]);
-  const r = (await tx.query(`select objid::int as k from pg_locks where locktype = 'advisory' and pid = pg_backend_pid()`)).rows;
+  // Two-key form: classid holds the first key, objid the second, objsubid is 2.
+  const r = (await tx.query(`select classid::int as k1, objid::int as k2, objsubid from pg_locks where locktype = 'advisory' and pid = pg_backend_pid()`)).rows;
   const want = (await tx.query(`select hashtext($1::text) as k`, [HA])).rows[0].k;
   await tx.rollback();
-  return r.some((x) => x.k === want);
+  return r.some((x) => x.k1 === 1 && x.k2 === want && x.objsubid === 2);
 }));
-ok(advisory, 'invite insert holds pg_advisory_xact_lock(hashtext(household_id))');
+ok(advisory, 'invite insert holds pg_advisory_xact_lock(1, hashtext(household_id))');
+
+// 12e. With no auth.uid() (the service role path, superuser standing in) the cap does not
+// apply: documented in the migration. Clean up afterwards so later checks see 19 open.
+await db.query(`select set_config('request.jwt.claim.sub', '', false)`);
+const svc = (await db.query(`insert into household_invite (household_id, created_by) select $1, $2 from generate_series(1, 2) returning code`, [HA, A])).rows.map((r) => r.code);
+ok((await openNow()) === 21, 'no uid, no cap: the server side can exceed 20');
+await db.query('delete from household_invite where code = any($1)', [svc]);
 
 // 14. Household rows: members read, owners update, nobody inserts or deletes from a client.
 // State here: A owns HA, B is a member of HA, C has left.

@@ -130,13 +130,22 @@ phone:
 
 1. Pull remote rows; anything strictly newer than the local row replaces it
 2. Push the merged set back, upserting on (household, ingredient)
-3. The household profile is shared so both phones suggest the same dishes, and only an owner
-   may change it: an owner's phone pushes it, every other phone takes the household's copy
+3. The household profile is shared so both phones suggest the same dishes, and only owners
+   may change it: every owner's phone pushes it (with two owners, whichever syncs last wins),
+   and every other phone takes the household's copy. A failed profile upload is reported
+   without failing the pantry sync
 4. Upsert recent cook-log entries cooked in this household, ignoring duplicates
 
 A sync only ever runs against the household the local pantry belongs to. Right after switching
-to a household this phone holds no copy of, it pulls only (pantry and profile) and pushes
-nothing. A result that lands after the phone has switched again is discarded.
+to a household this phone holds no copy of, it pulls only (pantry and profile, merged onto
+anything entered since the switch) and pushes nothing. A result that lands after the phone has
+switched again is discarded.
+
+An unbound pantry (never synced, or carried over from a build before this tracking existed) is
+the user's own. It may only be pushed to their own household; if the phone is on any other, the
+pantry and its cook log are put aside under the user's own household and the active one is
+pulled. **Limitation:** an older build already merged its pantry into whichever household it
+synced with. Those merges are on the server and cannot be undone from here.
 
 Ties keep the local row, which stops a no-op sync from churning state and re-rendering every
 screen. A failed sync returns an error and leaves the local pantry untouched.

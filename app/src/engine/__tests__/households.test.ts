@@ -2,7 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  alignLocalHousehold,
   commitSync,
+  cookLogHousehold,
+  maySyncWith,
   pickActiveHousehold,
   switchLocalHousehold,
   type Membership,
@@ -49,6 +52,7 @@ const local = (householdId: string | null, items: PantryItem[]): ScopedLocal => 
   pantry: new Map(items.map((i) => [i.ingredientId, i])),
   household: PROFILE,
   stash: {},
+  cookLog: [],
 });
 
 test('switching to a household this phone has never held empties the pantry and asks for a pull', () => {
@@ -93,4 +97,55 @@ test('the first sync binds the pantry to its household and can take its profile'
   assert.equal(next.householdId, 'own');
   assert.equal(next.household.adults, 4);
   assert.equal(next.needsPull, false);
+});
+
+const cooked = (n: number) => Array.from({ length: n }, (_, i) => ({ recipeId: `r${i}`, at: i }));
+
+test('meals cooked before the first sync stay with the household the phone was on when it switches', () => {
+  const unbound = { ...local(null, [item('atta', 500)]), cookLog: cooked(3) };
+  const onShared = switchLocalHousehold(unbound, 'joined', { from: 'own' });
+  assert.ok(onShared.cookLog.every((e) => e.householdId === 'own'));
+  const synced = commitSync(onShared, { householdId: 'joined', pantry: new Map() })!;
+  assert.ok(synced.cookLog.every((e) => cookLogHousehold(e, synced.householdId) === 'own'));
+});
+
+test('the first sync to the own household binds untagged meals to it', () => {
+  const unbound = { ...local(null, []), cookLog: cooked(2) };
+  const synced = commitSync(unbound, { householdId: 'own', pantry: new Map() })!;
+  assert.ok(synced.cookLog.every((e) => e.householdId === 'own'));
+});
+
+test('an unbound pantry may only sync with the user\'s own household', () => {
+  assert.equal(maySyncWith(null, 'own', [OWN, JOINED]), true);
+  assert.equal(maySyncWith(null, 'joined', [OWN, JOINED]), false);
+  assert.equal(maySyncWith('joined', 'joined', [OWN, JOINED]), true);
+  assert.equal(maySyncWith('own', 'joined', [OWN, JOINED]), false);
+});
+
+test('an upgraded phone on a joined household puts its pantry aside under its own and pulls', () => {
+  const upgraded = { ...local(null, [item('atta', 500)]), cookLog: cooked(1) };
+  const aligned = alignLocalHousehold(upgraded, 'joined', [OWN, JOINED]);
+  assert.equal(aligned.householdId, 'joined');
+  assert.equal(aligned.needsPull, true);
+  assert.equal(aligned.pantry.size, 0);
+  assert.deepEqual(aligned.stash.own?.pantry, [item('atta', 500)]);
+  assert.equal(aligned.cookLog[0]?.householdId, 'own');
+});
+
+test('aligning changes nothing when the phone is already where it should be', () => {
+  const unboundOnOwn = local(null, [item('atta', 500)]);
+  assert.equal(alignLocalHousehold(unboundOnOwn, 'own', [OWN, JOINED]), unboundOnOwn);
+  const bound = local('joined', []);
+  assert.equal(alignLocalHousehold(bound, 'joined', [OWN, JOINED]), bound);
+});
+
+test('after being removed from a household, its copy and any stale copies are dropped', () => {
+  const s = {
+    ...local('joined', [item('rice', 900)]),
+    stash: { own: { pantry: [item('atta', 500)], household: PROFILE }, gone: { pantry: [], household: PROFILE } },
+  };
+  const aligned = alignLocalHousehold(s, 'own', [OWN]);
+  assert.equal(aligned.householdId, 'own');
+  assert.deepEqual([...aligned.pantry.keys()], ['atta']);
+  assert.deepEqual(Object.keys(aligned.stash), []);
 });

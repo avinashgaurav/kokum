@@ -1,5 +1,14 @@
 import type { CookLogEntry, Household, Leftover, PantryItem } from '../engine/types';
 import { getSupabase, currentSession } from './supabase';
+import { cookLogHousehold, maySyncWith } from './households';
+import {
+  PROFILE_COLUMNS,
+  fromRemoteHousehold,
+  mergeRemotePantry,
+  toRemoteHousehold,
+  type RemoteHouseholdRow,
+  type RemotePantryRow,
+} from './syncCore';
 
 /**
  * Pantry sync.
@@ -23,14 +32,6 @@ export interface SyncResult {
   message: string;
   pulled: number;
   pushed: number;
-}
-
-interface RemotePantryRow {
-  ingredient_id: string;
-  quantity: number;
-  unit: PantryItem['unit'];
-  storage: PantryItem['storage'];
-  last_confirmed_at: string;
 }
 
 type SyncFailure = SyncResult & { ok: false };
@@ -57,52 +58,21 @@ export interface SyncSuccess extends SyncResult {
   household?: Household;
 }
 
-interface RemoteHouseholdRow {
-  adults: number;
-  children: number;
-  cooktop: Household['cooktop'];
-  burners: number;
-  diet: Household['diet'];
-  allergies: string[];
-  dislikes: string[];
-  equipment: Household['equipment'];
-  max_minutes_weekday: number;
-  max_minutes_weekend: number;
-  observances: Household['observances'];
-  weekly_budget_paise: number | string | null;
-}
-
-const PROFILE_COLUMNS =
-  'adults, children, cooktop, burners, diet, allergies, dislikes, equipment, ' +
-  'max_minutes_weekday, max_minutes_weekend, observances, weekly_budget_paise';
-
-function fromRemoteHousehold(r: RemoteHouseholdRow): Household {
-  return {
-    adults: r.adults,
-    children: r.children,
-    cooktop: r.cooktop,
-    burners: r.burners,
-    diet: r.diet,
-    allergies: r.allergies ?? [],
-    dislikes: r.dislikes ?? [],
-    equipment: r.equipment ?? [],
-    maxMinutesWeekday: r.max_minutes_weekday,
-    maxMinutesWeekend: r.max_minutes_weekend,
-    observances: r.observances ?? [],
-    ...(r.weekly_budget_paise == null ? {} : { weeklyBudgetPaise: Number(r.weekly_budget_paise) }),
-  };
-}
-
 /**
  * Syncs the local pantry with the household it belongs to and returns the result for the
  * caller to commit, tagged with that household's id.
  *
  * Normally both directions run in one pass, so a shared household converges after a single
  * sync from either phone. Right after switching to a household this phone holds no copy of
- * (`needsPull`), it only pulls: the empty local pantry replaces nothing on the server.
+ * (`needsPull`), it only pulls: pulled rows merge onto whatever is local and nothing is pushed.
  *
- * The profile (covers, cooktop, diet and the rest) is shared, and only an owner may change it:
- * an owner's phone pushes it, every other phone takes the household's copy.
+ * An unbound pantry (never synced, or from an older build) is the user's own, so it may only
+ * ever be pushed to their own household. The caller aligns local state first (see
+ * alignLocalHousehold); this refuses anything else as a backstop.
+ *
+ * The profile (covers, cooktop, diet and the rest) is shared, and only owners may change it:
+ * every owner's phone pushes it (with two owners, the last to sync wins), and every other
+ * phone takes the household's copy.
  */
 export async function syncPantry(local: LocalSnapshot): Promise<SyncSuccess | SyncFailure> {
   const sb = getSupabase();
@@ -116,7 +86,7 @@ export async function syncPantry(local: LocalSnapshot): Promise<SyncSuccess | Sy
   const target = session.householdId;
   // The pantry on screen belongs to another household. Never merge across: the caller
   // switches the local state over first, then syncs.
-  if (local.householdId !== null && local.householdId !== target) {
+  if (!maySyncWith(local.householdId, target, session.households)) {
     return off('This phone just changed household. Sync again.');
   }
   const isOwner = session.role === 'owner';
@@ -130,27 +100,7 @@ export async function syncPantry(local: LocalSnapshot): Promise<SyncSuccess | Sy
 
     if (pullError) return off(pullError.message);
 
-    const merged = local.needsPull ? new Map<string, PantryItem>() : new Map(local.pantry);
-    let pulled = 0;
-
-    for (const row of (remoteRows ?? []) as RemotePantryRow[]) {
-      const remoteAt = Date.parse(row.last_confirmed_at);
-      if (!Number.isFinite(remoteAt)) continue;
-
-      const mine = merged.get(row.ingredient_id);
-      // Strictly newer wins. On an exact tie the local row stays, which keeps a sync
-      // that changes nothing from churning state and re-rendering every screen.
-      if (!mine || remoteAt > mine.lastConfirmedAt) {
-        merged.set(row.ingredient_id, {
-          ingredientId: row.ingredient_id,
-          quantity: Number(row.quantity),
-          unit: row.unit,
-          storage: row.storage,
-          lastConfirmedAt: remoteAt,
-        });
-        pulled++;
-      }
-    }
+    const { merged, pulled } = mergeRemotePantry(local.pantry, (remoteRows ?? []) as RemotePantryRow[]);
 
     let household: Household | undefined;
     if (local.needsPull || !isOwner) {
@@ -194,32 +144,23 @@ export async function syncPantry(local: LocalSnapshot): Promise<SyncSuccess | Sy
     if (pushError) return off(pushError.message);
 
     // ---- household profile ----
-    // Only an owner's phone writes it (RLS refuses anyone else). Other phones took the
-    // household's copy above.
+    // Only owners' phones write it (RLS refuses anyone else); other phones took the
+    // household's copy above. A failed upload does not undo a pantry sync that worked, so it
+    // is reported alongside the success rather than as a failure.
+    let profileNote = '';
     if (isOwner) {
       const { error: profilePushError } = await sb
         .from('household')
-        .update({
-          adults: local.household.adults,
-          children: local.household.children,
-          cooktop: local.household.cooktop,
-          burners: local.household.burners,
-          diet: local.household.diet,
-          allergies: local.household.allergies,
-          dislikes: local.household.dislikes,
-          equipment: local.household.equipment,
-          observances: local.household.observances,
-          weekly_budget_paise: local.household.weeklyBudgetPaise ?? null,
-        })
+        .update(toRemoteHousehold(local.household))
         .eq('id', target);
-      if (profilePushError) return off(profilePushError.message);
+      if (profilePushError) profileNote = ` Household settings did not upload: ${profilePushError.message}`;
     }
 
     // ---- cook log ----
-    // Only what was cooked in this household. Untagged entries predate the first sync and
-    // belong to the household that sync binds to, which is this one.
+    // Only what was cooked in this household. An untagged entry belongs to the household the
+    // unbound pantry belongs to, which maySyncWith above has already established is this one.
     const recent = local.cookLog
-      .filter((e) => (e.householdId ?? target) === target)
+      .filter((e) => cookLogHousehold(e, local.householdId ?? target) === target)
       .slice(-100)
       .map((e) => ({
         household_id: target,
@@ -234,9 +175,9 @@ export async function syncPantry(local: LocalSnapshot): Promise<SyncSuccess | Sy
     return {
       ok: true,
       message:
-        pulled > 0
+        (pulled > 0
           ? `Synced. ${pulled} ${pulled === 1 ? 'item was' : 'items were'} newer on the other phone.`
-          : 'Synced. Everything already matched.',
+          : 'Synced. Everything already matched.') + profileNote,
       pulled,
       pushed: payload.length,
       householdId: target,

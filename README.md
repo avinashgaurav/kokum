@@ -38,8 +38,8 @@ The SQL checks run the migration in PGlite (Postgres in WASM) as the `authentica
 cd supabase/tests && npm install && npm test && rm -rf node_modules
 ```
 
-Current status: typecheck clean, **63 of 63 tests passing**, **53 of 53 SQL checks passing**.
-Metro last bundled 1135 modules (not re-run since the household-scoping change).
+Current status: typecheck clean, **73 of 73 tests passing**, **54 of 54 SQL checks passing**,
+Metro bundles 1138 modules.
 
 ## Status
 
@@ -119,7 +119,7 @@ kokum/
         cook.ts          the four depletion events
         plan.ts          weekly plan, leftovers, guest mode
         insights.ts      nutrition, spend and waste for the week
-        __tests__/       48 invariant tests, 15 invite and household tests
+        __tests__/       48 invariant tests, 25 invite, household and sync tests
       ai/              Claude: parsing, reranking, mood interpretation
       db/              Supabase client and pantry sync
       data/            ingredient dictionary (37), recipe corpus (14, all verified)

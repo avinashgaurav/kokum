@@ -438,6 +438,12 @@ grant insert (household_id, role, expires_at) on household_invite to authenticat
 -- A caller who is not an owner of the household is passed straight through, before the lock
 -- and the count, and the insert policy then rejects them. Otherwise a non-owner could probe
 -- whether a household is at the cap, or hold its lock.
+--
+-- That includes a caller with no auth.uid() at all, such as the service role, which also
+-- bypasses RLS: server-side inserts are not capped. Only clients are.
+--
+-- The lock uses the two-key form, with 1 as this lock's namespace, so it cannot collide with
+-- any other advisory lock keyed on a single bigint.
 create or replace function public.cap_open_invites() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -445,7 +451,7 @@ begin
     return new;
   end if;
 
-  perform pg_advisory_xact_lock(hashtext(new.household_id::text));
+  perform pg_advisory_xact_lock(1, hashtext(new.household_id::text));
 
   if (select count(*) from public.household_invite i
       where i.household_id = new.household_id and i.used_at is null and i.expires_at > now()) >= 20
