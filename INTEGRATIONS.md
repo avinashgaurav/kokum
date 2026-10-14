@@ -99,9 +99,11 @@ per platform later without touching a screen.
 Automating the cart is blocked. **Automating the reconciliation is not, and is worth more.**
 
 Every grocery order produces an invoice with exact items, quantities and prices. Photograph it,
-and `parseImage(..., 'bill')` restocks the entire pantry at full confidence in one action.
+and `parseImage(..., 'bill')` turns it into pantry lines that restock the pantry after one
+confirm screen.
 
-This is built and working. It is the single highest-value feature in the app, and it exists
+This is built. Like the rest of the AI layer it has no eval yet and has not been run on a
+physical device. It is the single highest-value feature in the app, and it exists
 precisely *because* the cart API does not:
 
 - The two moments that matter are **what arrived** and **what got cooked**. Both are now

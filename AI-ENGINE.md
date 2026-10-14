@@ -64,6 +64,8 @@ not reshuffle on re-render, and it returns `null` rather than something uncookab
 ## Layer 2: Claude
 
 Model: `claude-opus-5-5` (see DECISIONS D-011). Three uses, all optional, all degrading to nothing.
+Two are wired into screens today (parsing on Capture, reranking on Today); mood interpretation
+is written but not yet called.
 
 ### Parsing (`src/ai/parse.ts`)
 
@@ -104,7 +106,7 @@ It returns an array of `{recipeId, reason}`. Then `reattach()`:
 - resolves each id against our own local suggestion objects
 - keeps only the sentence
 - drops any id that does not resolve (hallucination)
-- appends any dish the model forgot, with its deterministic sentence
+- appends any dish the model forgot (after the ranked ones), with its deterministic sentence
 - attaches the assessment **this device computed**, never anything the model sent
 
 So the worst a maliciously wrong response can do is order the list oddly or write an odd
@@ -119,7 +121,8 @@ The prompt still says it plainly, because defence in depth is cheap:
 ### Mood interpretation (`interpretMood`)
 
 Maps free text onto a closed enum of mood tags, so "something to cure a hangover" reaches egg
-bhurji. Constrained by the schema to the tags that exist.
+bhurji. Constrained by the schema to the tags that exist. Not yet called from any screen; today
+the typed mood or search text reaches the model only as context for reranking.
 
 ---
 
@@ -143,7 +146,8 @@ The app has never needed the network to tell you what to cook, and it never will
 
 ## Cost
 
-One rerank call per meaningful state change, one parse call per capture. The deterministic
+One rerank call per meaningful state change, one parse call per capture. A per-call estimate
+with the arithmetic is in [docs/PRD.md](docs/PRD.md); nothing has been measured yet. The deterministic
 layer does all the load-bearing work, which is what keeps this cheap: Claude is doing
 presentation and extraction, not decision-making.
 

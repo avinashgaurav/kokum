@@ -17,9 +17,9 @@ never compute a dish's state and it may never edit a missing-item list.
 
 | State | Condition | What the user can do |
 |---|---|---|
-| `cook-now` | Every core ingredient above confidence 0.75 | Start cooking, I cooked this |
+| `cook-now` | Every core ingredient present in quantity, at confidence 0.75 or higher | Start cooking, I cooked this |
 | `need-items` | One or more core ingredients absent, each named | Order the items, or order the dish |
-| `check-first` | A core ingredient sits between 0.55 and 0.75 | One tap to confirm, which resolves to one of the above |
+| `check-first` | Nothing missing, but a core ingredient is below confidence 0.75 (`COOK_THRESHOLD`) | One tap to confirm, which resolves to one of the above |
 
 ### Push versus pull
 
@@ -67,10 +67,11 @@ All three must pass. Beyond that, specific to this product:
 
 1. **Golden-set suggester tests** (`src/engine/__tests__/invariant.test.ts`). The sacred rule as
    executable assertions. This suite must be impossible to skip.
-2. **Drift simulation.** Replay 8 weeks of synthetic cook logs against a known ground-truth
-   pantry and assert the model stays within tolerance.
-3. **Adversarial LLM test.** Feed the rerank layer a response that tries to change a dish state
-   or invent an ingredient, and assert the code-computed values survive untouched.
+2. **Drift simulation (not built yet).** Replay 8 weeks of synthetic cook logs against a known
+   ground-truth pantry and assert the model stays within tolerance.
+3. **Adversarial LLM test (not built yet).** Feed the rerank layer a response that tries to
+   change a dish state or invent an ingredient, and assert the code-computed values survive
+   untouched. Today that property rests on `reattach()` in `src/ai/rerank.ts`, which has no test.
 
 ## Conventions
 
