@@ -180,7 +180,7 @@ showing a broken sign-in form.
   has no image column.
 - **The API key** lives in the device keychain via `expo-secure-store`, never in app state,
   never in the AsyncStorage blob, never logged.
-- **Nothing is uploaded** unless the user explicitly signs in for sharing.
+- **Nothing is synced to Supabase** unless the user explicitly signs in for sharing.
 - **Memory stores and prompts** never receive the API key or any credential.
 
 ---
