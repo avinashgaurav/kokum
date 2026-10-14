@@ -247,7 +247,8 @@ chose. The old flow, typing the household's uuid and inserting your own membersh
 - **The database makes the code.** Ten Crockford base32 symbols (no I, L, O or U), 50 bits from
   `gen_random_uuid()`. Column grants let a client set only the household, the role and an
   earlier expiry, so nobody can mint a guessable code or insert one already redeemed.
-- **One use, 7 days by default, 30 at most.** `owner` is never grantable by code.
+- **One use, 7 days by default, 30 at most, never already expired.** `owner` is never
+  grantable by code. A household holds at most 20 open (unused, unexpired) codes at once.
 - **Only the owner sees a household's codes.** Nobody else can read the table, so codes cannot
   be listed; redemption goes only through the RPC.
 - **The RPC is the one door.** Security definer, empty `search_path`, everything
@@ -258,10 +259,20 @@ chose. The old flow, typing the household's uuid and inserting your own membersh
 - **The client normalises the same way** (`app/src/db/inviteCode.ts`), so `qy7nw-ltc8s` works
   and a pasted uuid is caught before a round trip.
 
-A user who joins keeps the household created at signup; `currentSession` picks the most
-recently joined. Not built: rate limiting on redemption (50 bits over 7 days makes guessing
-impractical), and a screen to list or revoke codes, which RLS already allows.
+**Joining never moves you.** A user who joins keeps the household created at signup, and the
+phone stays on it until they choose otherwise. The active household is a per-device choice in
+AsyncStorage (`app/src/db/households.ts`), defaulting to the user's own household (the
+earliest one they own). After a successful join, Settings asks before switching and warns that
+the next sync merges this phone's pantry into the joined one. A switcher lists every household
+the account belongs to, and "Leave this household" deletes the user's own membership row, which
+the last-owner trigger still refuses for a sole owner. A per-device choice rather than a profile
+column because what a phone syncs with is a property of that phone.
+
+**Throttling.** Redemption has no rate limit of its own. It relies on Supabase's API rate limits
+plus 50-bit codes that expire in 7 days, which together make guessing impractical. Not built: a
+screen to list or revoke codes, which RLS already allows.
 
 Verified with PGlite against a stub `auth` schema, as role `authenticated` with RLS on:
-33 checks covering invite, join, rejection paths, the cook role and the last-owner guard. Still
+37 checks covering invite, join, used, expired and demoted-owner codes, expiry at insert, the
+20-code cap, the cook role and the last-owner guard. Still
 not applied to a live Supabase project (Q-06).

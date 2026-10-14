@@ -32,7 +32,7 @@ npm run verify     # tsc --noEmit, then the engine test suite
 npx expo export --platform android --output-dir dist && rm -rf dist
 ```
 
-Current status: typecheck clean, **52 of 52 tests passing**, Metro bundles 1135 modules.
+Current status: typecheck clean, **56 of 56 tests passing**, Metro bundles 1135 modules.
 
 ## Status
 
@@ -111,7 +111,7 @@ kokum/
         cook.ts          the four depletion events
         plan.ts          weekly plan, leftovers, guest mode
         insights.ts      nutrition, spend and waste for the week
-        __tests__/       48 invariant tests, 4 invite-code tests
+        __tests__/       48 invariant tests, 8 invite and household tests
       ai/              Claude: parsing, reranking, mood interpretation
       db/              Supabase client and pantry sync
       data/            ingredient dictionary (37), recipe corpus (14, all verified)

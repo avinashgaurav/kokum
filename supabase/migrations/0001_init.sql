@@ -80,6 +80,10 @@ language sql volatile set search_path = '' as $$
        unnest(array[0, 1, 2, 3, 4, 5, 9, 10, 11, 12]) as i;
 $$;
 
+-- It is the column default, so it runs as whoever inserts the invite.
+revoke execute on function public.new_invite_code() from public, anon;
+grant execute on function public.new_invite_code() to authenticated;
+
 create table household_invite (
   code         text primary key default public.new_invite_code()
                check (code ~ '^[0-9A-HJKMNP-TV-Z]{10}$'),
@@ -412,11 +416,26 @@ revoke all on household_invite from public, anon, authenticated;
 grant select, delete on household_invite to authenticated;
 grant insert (household_id, role, expires_at) on household_invite to authenticated;
 
+-- Open invites: unused and unexpired. Security definer for the same reason as the helpers
+-- above, so the insert policy can count them without depending on the select policy.
+create or replace function public.open_invite_count(h uuid) returns int
+language sql security definer stable set search_path = '' as $$
+  select count(*)::int from public.household_invite i
+  where i.household_id = h and i.used_at is null and i.expires_at > now();
+$$;
+
+revoke execute on function public.open_invite_count(uuid) from public, anon;
+grant execute on function public.open_invite_count(uuid) to authenticated;
+
 create policy invite_read on household_invite
   for select using (is_household_owner(household_id));
 create policy invite_insert on household_invite
   for insert with check (
-    is_household_owner(household_id) and expires_at <= now() + interval '30 days'
+    is_household_owner(household_id)
+    and expires_at > now()
+    and expires_at <= now() + interval '30 days'
+    -- At most 20 open codes per household. Revoke or let some expire to issue more.
+    and public.open_invite_count(household_id) < 20
   );
 create policy invite_delete on household_invite
   for delete using (is_household_owner(household_id));

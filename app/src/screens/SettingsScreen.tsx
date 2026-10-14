@@ -13,6 +13,8 @@ import {
   createInvite,
   currentSession,
   joinHousehold,
+  leaveHousehold,
+  setActiveHousehold,
   type Invite,
   signIn,
   signOut,
@@ -237,6 +239,8 @@ function SharingCard() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [invite, setInvite] = useState<Invite | null>(null);
+  // A household just joined, waiting for the user to say whether this phone should switch.
+  const [pendingSwitch, setPendingSwitch] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
@@ -290,6 +294,65 @@ function SharingCard() {
           <Text style={[type.body, { color: color.inkSoft }]}>
             Signed in as {session.email ?? 'your account'}.
           </Text>
+
+          {pendingSwitch ? (
+            <>
+              <Text style={[type.body, { color: color.inkSoft }]}>
+                Joined. Switch this phone to that household? The next sync merges this phone's
+                pantry into it. Your own household stays as it is, and you can switch back here.
+              </Text>
+              <View style={{ flexDirection: 'row', gap: space.sm }}>
+                <Button
+                  label="Switch to it"
+                  onPress={async () => {
+                    await setActiveHousehold(pendingSwitch);
+                    setPendingSwitch(null);
+                    setInvite(null);
+                    setNote(null);
+                    setSession(await currentSession());
+                  }}
+                />
+                <Button label="Stay here" variant="secondary" onPress={() => setPendingSwitch(null)} />
+              </View>
+            </>
+          ) : null}
+
+          {session.households.length > 1 ? (
+            <>
+              <Text style={[type.small, { color: color.muted }]}>Household on this phone</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+                {session.households.map((h) => (
+                  <Chip
+                    key={h.householdId}
+                    label={`${h.name} · ${h.role}`}
+                    active={h.householdId === session.householdId}
+                    onPress={async () => {
+                      if (busy || h.householdId === session.householdId) return;
+                      await setActiveHousehold(h.householdId);
+                      setInvite(null);
+                      setNote(null);
+                      setSession(await currentSession());
+                    }}
+                  />
+                ))}
+              </View>
+              <Button
+                label="Leave this household"
+                variant="quiet"
+                disabled={busy || !session.householdId}
+                onPress={async () => {
+                  setBusy(true);
+                  const r = await leaveHousehold(session.householdId!);
+                  setNote(r.message);
+                  if (r.ok) {
+                    setInvite(null);
+                    setSession(await currentSession());
+                  }
+                  setBusy(false);
+                }}
+              />
+            </>
+          ) : null}
 
           {session.householdId && session.role === 'owner' ? (
             <>
@@ -346,8 +409,13 @@ function SharingCard() {
               onPress={async () => {
                 setBusy(true);
                 const r = await joinHousehold(code.trim());
-                setNote(r.message);
-                if (r.ok) setSession(await currentSession());
+                if (r.ok && r.householdId) {
+                  setNote(null);
+                  setSession(await currentSession());
+                  setPendingSwitch(r.householdId);
+                } else {
+                  setNote(r.message);
+                }
                 setCode('');
                 setBusy(false);
               }}
@@ -361,6 +429,7 @@ function SharingCard() {
               await signOut();
               setSession(null);
               setInvite(null);
+              setPendingSwitch(null);
               setNote(null);
             }}
           />
