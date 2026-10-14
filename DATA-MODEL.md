@@ -90,11 +90,15 @@ better. **Images are never stored**, only extracted text.
 Membership resolves through a security-definer function:
 
 ```sql
-create function is_household_member(h uuid) returns boolean
+create or replace function public.is_household_member(h uuid) returns boolean
 language sql security definer stable set search_path = public as $$
-  select exists (select 1 from household_member
-                 where household_id = h and user_id = auth.uid());
+  select exists (
+    select 1 from public.household_member m
+    where m.household_id = h and m.user_id = auth.uid()
+  );
 $$;
+revoke execute on function public.is_household_member(uuid) from public, anon;
+grant execute on function public.is_household_member(uuid) to authenticated;
 ```
 
 The function exists to break a recursion. A plain subquery against `household_member` inside a
@@ -171,8 +175,9 @@ showing a broken sign-in form.
 
 ## Privacy
 
-- **Grocery bills are personal financial data.** Images stay on the device. Only extracted
-  text is ever transmitted, and only to Anthropic for parsing.
+- **Grocery bills are personal financial data.** Photos are sent to Anthropic once, for
+  parsing, and never stored: the app keeps only the extracted lines, and the `capture` table
+  has no image column.
 - **The API key** lives in the device keychain via `expo-secure-store`, never in app state,
   never in the AsyncStorage blob, never logged.
 - **Nothing is uploaded** unless the user explicitly signs in for sharing.
@@ -187,6 +192,6 @@ showing a broken sign-in form.
   the sync does not touch them yet.
 - **No conflict surface.** When last-write-wins discards a value, the user is told how many
   rows changed but not which, and cannot review or undo the merge.
-- **The migration has never been run against a live project.** The SQL is written and
-  reviewed, and nobody has applied it, which means the RLS policies in particular are
-  unverified in practice.
+- **The migration has never been run against a live project.** The SQL is written, reviewed
+  and exercised in PGlite as the `authenticated` role (`supabase/tests/rls.mjs`, 54 checks),
+  but nobody has applied it to real Supabase, so the RLS policies are unverified in practice.
