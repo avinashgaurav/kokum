@@ -66,6 +66,7 @@ quantities are never subtracted.
 |---|---|
 | `household` | Covers, cooktop, diet, allergies, equipment, observances, budget |
 | `household_member` | The join. Roles: owner, member, cook. |
+| `household_invite` | One-use codes an owner issues; redeemed only through `join_household()` |
 | `ingredient` | Global dictionary, read-only to clients |
 | `ingredient_alias` | What turns three spellings into one row you can do arithmetic on |
 | `recipe`, `recipe_ingredient` | `household_id` null for the shared corpus |

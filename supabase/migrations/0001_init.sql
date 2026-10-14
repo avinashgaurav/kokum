@@ -64,6 +64,37 @@ create table household_member (
 
 create index on household_member (user_id);
 
+-- Invite codes. Joining a household is an owner handing someone a code, never a user writing
+-- their own membership row (RLS forbids that; see member_insert). The code is generated here,
+-- not by the client, so its strength does not depend on which app version issued it.
+--
+-- Alphabet is Crockford base32: no I, L, O or U, so a code read aloud or copied off a screen
+-- survives. 10 symbols at 5 bits each is 50 bits drawn from gen_random_uuid(), skipping the
+-- uuid's version and variant bytes so every bit used is random. 32 divides 256, so taking each
+-- byte mod 32 has no bias.
+create or replace function public.new_invite_code() returns text
+language sql volatile set search_path = '' as $$
+  select string_agg(
+           substr('0123456789ABCDEFGHJKMNPQRSTVWXYZ', get_byte(b, i) % 32 + 1, 1), '' order by i)
+  from (select uuid_send(gen_random_uuid()) as b) u,
+       unnest(array[0, 1, 2, 3, 4, 5, 9, 10, 11, 12]) as i;
+$$;
+
+create table household_invite (
+  code         text primary key default public.new_invite_code()
+               check (code ~ '^[0-9A-HJKMNP-TV-Z]{10}$'),
+  household_id uuid not null references household(id) on delete cascade,
+  -- Ownership is never handed out by code. Promoting someone is a deliberate owner action.
+  role         member_role not null default 'member' check (role <> 'owner'),
+  created_by   uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at   timestamptz not null default now(),
+  expires_at   timestamptz not null default (now() + interval '7 days'),
+  used_by      uuid references auth.users(id) on delete set null,
+  used_at      timestamptz
+);
+
+create index on household_invite (household_id);
+
 -- ---------------------------------------------------------------------------
 -- ingredient dictionary (global, read-only to clients)
 -- ---------------------------------------------------------------------------
@@ -368,6 +399,28 @@ create policy member_update on household_member
 create policy member_delete on household_member
   for delete using (is_household_owner(household_id) or user_id = auth.uid());
 
+-- Invites: the owner of a household creates, lists and revokes its codes. Nobody else can read
+-- one, so a code cannot be harvested by listing the table; redeeming goes through
+-- join_household() below. There is no update policy: only that function marks a code used.
+--
+-- Column grants close the rest. A client may choose the household, the role and an earlier
+-- expiry, nothing else: the code, its creator and its used_by/used_at are always set by the
+-- database, so nobody can mint a guessable code or insert one pre-redeemed.
+alter table household_invite enable row level security;
+
+revoke all on household_invite from public, anon, authenticated;
+grant select, delete on household_invite to authenticated;
+grant insert (household_id, role, expires_at) on household_invite to authenticated;
+
+create policy invite_read on household_invite
+  for select using (is_household_owner(household_id));
+create policy invite_insert on household_invite
+  for insert with check (
+    is_household_owner(household_id) and expires_at <= now() + interval '30 days'
+  );
+create policy invite_delete on household_invite
+  for delete using (is_household_owner(household_id));
+
 create policy pantry_rw on pantry_item
   for all using (is_household_member(household_id)) with check (is_household_member(household_id));
 
@@ -412,6 +465,64 @@ create policy recipe_write on recipe
 create policy ingredient_read on ingredient for select using (auth.role() = 'authenticated');
 create policy alias_read on ingredient_alias for select using (auth.role() = 'authenticated');
 create policy recipe_ing_read on recipe_ingredient for select using (auth.role() = 'authenticated');
+
+-- ---------------------------------------------------------------------------
+-- joining a household by invite code
+--
+-- The caller is not a member yet, so member_insert would reject their own row. This function
+-- is the one door: it runs as the table owner, checks the code, and adds exactly the caller
+-- with exactly the role the owner chose. search_path is empty and every object is qualified.
+--
+-- Input is normalised the Crockford way (case-folded, spaces and hyphens dropped, O read as 0,
+-- I and L as 1), so a code typed off a screen still works. A missing, expired, used or orphaned
+-- code all get the same error, so the function does not tell a guesser which codes exist. Already being
+-- a member is an error and leaves the code unused. The row lock stops two people redeeming one
+-- code at the same moment.
+-- ---------------------------------------------------------------------------
+create or replace function public.join_household(p_code text) returns uuid
+language plpgsql security definer volatile set search_path = '' as $$
+declare
+  v_uid  uuid := auth.uid();
+  v_code text;
+  v_inv  public.household_invite%rowtype;
+begin
+  if v_uid is null then
+    raise exception 'sign in to join a household' using errcode = 'insufficient_privilege';
+  end if;
+
+  v_code := translate(upper(regexp_replace(coalesce(p_code, ''), '[\s-]', '', 'g')), 'OIL', '011');
+
+  select * into v_inv from public.household_invite i where i.code = v_code for update;
+
+  -- A code is only as good as the owner who issued it: if they have since stopped being an
+  -- owner of that household, so has the code.
+  if not found or v_inv.used_at is not null or v_inv.expires_at <= now() or not exists (
+       select 1 from public.household_member m
+       where m.household_id = v_inv.household_id and m.user_id = v_inv.created_by
+         and m.role = 'owner'
+     ) then
+    raise exception 'invite code is not valid' using errcode = 'invalid_parameter_value';
+  end if;
+
+  if exists (
+    select 1 from public.household_member m
+    where m.household_id = v_inv.household_id and m.user_id = v_uid
+  ) then
+    raise exception 'already a member of this household' using errcode = 'unique_violation';
+  end if;
+
+  insert into public.household_member (household_id, user_id, role)
+  values (v_inv.household_id, v_uid, v_inv.role);
+
+  update public.household_invite
+     set used_by = v_uid, used_at = now()
+   where code = v_inv.code;
+
+  return v_inv.household_id;
+end $$;
+
+revoke execute on function public.join_household(text) from public, anon;
+grant execute on function public.join_household(text) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- new users get a household automatically

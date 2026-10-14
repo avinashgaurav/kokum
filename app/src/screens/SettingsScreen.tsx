@@ -10,8 +10,10 @@ import { INGREDIENT_INDEX } from '../data/ingredients';
 import { rupees, weekInsights } from '../engine/insights';
 import {
   CLOUD_CONFIGURED,
+  createInvite,
   currentSession,
   joinHousehold,
+  type Invite,
   signIn,
   signOut,
   type CloudSession,
@@ -234,6 +236,7 @@ function SharingCard() {
   const [session, setSession] = useState<CloudSession | null>(null);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [invite, setInvite] = useState<Invite | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
@@ -288,14 +291,38 @@ function SharingCard() {
             Signed in as {session.email ?? 'your account'}.
           </Text>
 
-          {session.householdId ? (
+          {session.householdId && session.role === 'owner' ? (
             <>
               <Text style={[type.small, { color: color.muted }]}>
-                Household code. Whoever else cooks here enters this on their phone.
+                Invite whoever else cooks here. They enter the code on their phone. Each code
+                works once and lasts 7 days.
               </Text>
-              <Text selectable style={s.code}>
-                {session.householdId}
-              </Text>
+              {invite ? (
+                <Text selectable style={s.code}>
+                  {invite.code}
+                </Text>
+              ) : null}
+              <View style={{ flexDirection: 'row', gap: space.sm }}>
+                {(['member', 'cook'] as const).map((role) => (
+                  <Button
+                    key={role}
+                    label={role === 'member' ? 'Invite a member' : 'Invite a cook'}
+                    variant="secondary"
+                    disabled={busy}
+                    onPress={async () => {
+                      setBusy(true);
+                      const r = await createInvite(session.householdId!, role);
+                      if (r.ok) {
+                        setInvite(r.invite);
+                        setNote(null);
+                      } else {
+                        setNote(r.message);
+                      }
+                      setBusy(false);
+                    }}
+                  />
+                ))}
+              </View>
             </>
           ) : null}
 
@@ -305,11 +332,12 @@ function SharingCard() {
             <TextInput
               value={code}
               onChangeText={setCode}
-              placeholder="Join another household"
+              placeholder="Invite code"
               placeholderTextColor={color.muted}
               style={[s.keyInput, { flex: 1 }]}
-              autoCapitalize="none"
+              autoCapitalize="characters"
               autoCorrect={false}
+              accessibilityLabel="Invite code to join another household"
             />
             <Button
               label="Join"
@@ -332,6 +360,7 @@ function SharingCard() {
             onPress={async () => {
               await signOut();
               setSession(null);
+              setInvite(null);
               setNote(null);
             }}
           />

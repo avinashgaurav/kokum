@@ -17,8 +17,11 @@ import * as SecureStore from 'expo-secure-store';
 
 const KEY_SLOT = 'kokum.anthropic.key';
 
-/** Opus 5. The deterministic engine does the load-bearing work, so one call per day is cheap. */
-export const MODEL = 'claude-opus-5';
+/**
+ * Opus 5.5, the current Opus: same features as Opus 5 at a lower price. The deterministic
+ * engine does the load-bearing work, so one call per day is cheap. Reasoning in DECISIONS D-011.
+ */
+export const MODEL = 'claude-opus-5-5';
 
 let cached: Anthropic | null = null;
 let cachedKey: string | null = null;

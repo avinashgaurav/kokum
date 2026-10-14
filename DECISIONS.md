@@ -164,8 +164,8 @@ same parser.
 
 ---
 
-## D-011 · Model: claude-opus-5
-**Date:** 2026-08-07 · **Status:** Locked
+## D-011 · Model: claude-opus-5-5
+**Date:** 2026-08-07, revised 2026-10-14 · **Status:** Locked
 
 Used for three things: parsing captures, reranking and explaining suggestions, and mapping
 free-text moods onto tags.
@@ -177,6 +177,15 @@ are used everywhere, so the shape is guaranteed and only the meaning needs re-va
 The API key lives in the device keychain and is entered by the user. That is right for a
 personal app and wrong for a multi-tenant product, which would proxy through a server holding
 one key. `src/ai/client.ts` is the seam where that proxy goes.
+
+**2026-10-14:** moved from `claude-opus-5` (still a valid id) to `claude-opus-5-5`, the current
+Opus. Same 1M context and feature set, cheaper per token ($4 / $20 per million against $5 / $25).
+None of its breaking changes touch this code: no call sets `thinking`, forces `tool_choice`, or
+uses computer use. One behaviour to know: its default effort is `medium`, one below Opus 5.
+Sonnet 5.5 ($2 / $10) was considered and not taken. The reasoning above still holds: volume is
+one parse per capture and one rerank per state change, the key is the user's own, and parse
+accuracy on handwritten lists and Hinglish bills is where a mistake costs trust. Revisit once
+the AI layer has an eval that can show Sonnet holding quality.
 
 ---
 
@@ -225,3 +234,34 @@ Not built yet.
 Also hardened in place: the security-definer helpers are schema-qualified and executable by
 `authenticated` only, and a `household_member_keep_owner` trigger refuses removing or demoting
 a household's last owner, or changing a row's `household_id` or `user_id`.
+
+---
+
+## D-014 · Joining a household is by owner-issued invite code
+**Date:** 2026-10-14 · **Status:** Locked
+
+Closes the gap D-013 left open. An owner creates a row in `household_invite`; whoever redeems
+the code through `public.join_household(code)` is added as a member with the role the owner
+chose. The old flow, typing the household's uuid and inserting your own membership row, is gone.
+
+- **The database makes the code.** Ten Crockford base32 symbols (no I, L, O or U), 50 bits from
+  `gen_random_uuid()`. Column grants let a client set only the household, the role and an
+  earlier expiry, so nobody can mint a guessable code or insert one already redeemed.
+- **One use, 7 days by default, 30 at most.** `owner` is never grantable by code.
+- **Only the owner sees a household's codes.** Nobody else can read the table, so codes cannot
+  be listed; redemption goes only through the RPC.
+- **The RPC is the one door.** Security definer, empty `search_path`, everything
+  schema-qualified, executable by `authenticated` only. Unknown, expired, used and orphaned
+  codes (issuer no longer an owner) get the same error, so it confirms nothing to a guesser.
+  Already being a member is a separate error and leaves the code unused. A row lock stops two
+  people redeeming one code at once.
+- **The client normalises the same way** (`app/src/db/inviteCode.ts`), so `qy7nw-ltc8s` works
+  and a pasted uuid is caught before a round trip.
+
+A user who joins keeps the household created at signup; `currentSession` picks the most
+recently joined. Not built: rate limiting on redemption (50 bits over 7 days makes guessing
+impractical), and a screen to list or revoke codes, which RLS already allows.
+
+Verified with PGlite against a stub `auth` schema, as role `authenticated` with RLS on:
+33 checks covering invite, join, rejection paths, the cook role and the last-owner guard. Still
+not applied to a live Supabase project (Q-06).
