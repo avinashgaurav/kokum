@@ -28,8 +28,12 @@ exists for.
 AsyncStorage, one JSON blob under `kokum.state.v1`, written after every state change:
 
 ```ts
-{ household, pantry: PantryItem[], cookLog, leftovers }
+{ household, pantry: PantryItem[], cookLog, leftovers, householdId, needsPull, stash }
 ```
+
+`householdId` is the shared household the pantry and profile belong to (null until the first
+sync). `stash` holds this phone's copy of every other household it has been on, so switching
+households swaps the pantry instead of merging it (DECISIONS D-015).
 
 The pantry is a `Map` in memory and an array on disk. Corrupt or unreadable storage falls
 through to the seed pantry rather than a blank app, and a failed write never takes the session
@@ -126,8 +130,13 @@ phone:
 
 1. Pull remote rows; anything strictly newer than the local row replaces it
 2. Push the merged set back, upserting on (household, ingredient)
-3. Push the household profile, so both phones suggest the same dishes
-4. Upsert recent cook-log entries, ignoring duplicates
+3. The household profile is shared so both phones suggest the same dishes, and only an owner
+   may change it: an owner's phone pushes it, every other phone takes the household's copy
+4. Upsert recent cook-log entries cooked in this household, ignoring duplicates
+
+A sync only ever runs against the household the local pantry belongs to. Right after switching
+to a household this phone holds no copy of, it pulls only (pantry and profile) and pushes
+nothing. A result that lands after the phone has switched again is discarded.
 
 Ties keep the local row, which stops a no-op sync from churning state and re-rendering every
 screen. A failed sync returns an error and leaves the local pantry untouched.

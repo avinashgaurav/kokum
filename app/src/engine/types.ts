@@ -122,6 +122,11 @@ export interface Leftover {
 export interface CookLogEntry {
   recipeId: string;
   at: number;
+  /**
+   * The shared household this was cooked in, so sync only uploads it there. Absent while the
+   * phone has never synced; the first sync stamps it.
+   */
+  householdId?: string;
 }
 
 /** The three states. Computed in code, never by the model. See AGENTS.md. */

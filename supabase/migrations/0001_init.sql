@@ -347,6 +347,13 @@ begin
     return case when tg_op = 'DELETE' then old else new end;
   end if;
 
+  -- Serialise owner removals per household. Without this, two owners leaving at the same
+  -- moment each see the other still there and both succeed, leaving no owner. The second
+  -- waits here until the first commits, and under read committed its check below then sees
+  -- the first one gone. When the household itself is being deleted its row is already gone,
+  -- so this locks nothing and the cascade proceeds.
+  perform 1 from public.household where id = old.household_id for update;
+
   if tg_op = 'DELETE' and (
        not exists (select 1 from public.household h where h.id = old.household_id)
     or not exists (select 1 from auth.users u where u.id = old.user_id)
@@ -387,8 +394,13 @@ alter table ingredient       enable row level security;
 alter table ingredient_alias enable row level security;
 alter table recipe_ingredient enable row level security;
 
-create policy household_rw on household
-  for all using (is_household_member(id)) with check (is_household_member(id));
+-- Any member may read their household's profile; only an owner may change it. There is no
+-- insert or delete policy: a household is created by handle_new_user() at signup (security
+-- definer, so RLS does not apply to it) and is never deleted from the client.
+create policy household_read on household
+  for select using (is_household_member(id));
+create policy household_update on household
+  for update using (is_household_owner(id)) with check (is_household_owner(id));
 
 create policy member_read on household_member
   for select using (user_id = auth.uid() or is_household_member(household_id));
@@ -416,16 +428,41 @@ revoke all on household_invite from public, anon, authenticated;
 grant select, delete on household_invite to authenticated;
 grant insert (household_id, role, expires_at) on household_invite to authenticated;
 
--- Open invites: unused and unexpired. Security definer for the same reason as the helpers
--- above, so the insert policy can count them without depending on the select policy.
-create or replace function public.open_invite_count(h uuid) returns int
-language sql security definer stable set search_path = '' as $$
-  select count(*)::int from public.household_invite i
-  where i.household_id = h and i.used_at is null and i.expires_at > now();
-$$;
+-- At most 20 open (unused, unexpired) codes per household. This is a trigger, not a check in
+-- the insert policy: a policy runs per row against a snapshot taken when the statement began,
+-- so a multi-row insert or two concurrent requests could each see 19 and all get through. The
+-- advisory lock serialises inserts per household until the transaction ends, and the count
+-- runs after the lock is held, so it sees rows inserted earlier in this statement and rows
+-- committed by whoever held the lock before.
+--
+-- A caller who is not an owner of the household is passed straight through, before the lock
+-- and the count, and the insert policy then rejects them. Otherwise a non-owner could probe
+-- whether a household is at the cap, or hold its lock.
+create or replace function public.cap_open_invites() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not public.is_household_owner(new.household_id) then
+    return new;
+  end if;
 
-revoke execute on function public.open_invite_count(uuid) from public, anon;
-grant execute on function public.open_invite_count(uuid) to authenticated;
+  perform pg_advisory_xact_lock(hashtext(new.household_id::text));
+
+  if (select count(*) from public.household_invite i
+      where i.household_id = new.household_id and i.used_at is null and i.expires_at > now()) >= 20
+  then
+    raise exception 'this household already has 20 open invite codes'
+      using errcode = 'check_violation',
+            hint = 'Revoke one, or wait for one to expire.';
+  end if;
+
+  return new;
+end $$;
+
+revoke execute on function public.cap_open_invites() from public, anon, authenticated;
+
+create trigger household_invite_cap
+  before insert on household_invite
+  for each row execute function public.cap_open_invites();
 
 create policy invite_read on household_invite
   for select using (is_household_owner(household_id));
@@ -434,8 +471,6 @@ create policy invite_insert on household_invite
     is_household_owner(household_id)
     and expires_at > now()
     and expires_at <= now() + interval '30 days'
-    -- At most 20 open codes per household. Revoke or let some expire to issue more.
-    and public.open_invite_count(household_id) < 20
   );
 create policy invite_delete on household_invite
   for delete using (is_household_owner(household_id));

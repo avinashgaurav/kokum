@@ -32,7 +32,14 @@ npm run verify     # tsc --noEmit, then the engine test suite
 npx expo export --platform android --output-dir dist && rm -rf dist
 ```
 
-Current status: typecheck clean, **56 of 56 tests passing**, Metro bundles 1135 modules.
+The SQL checks run the migration in PGlite (Postgres in WASM) as the `authenticated` role:
+
+```bash
+cd supabase/tests && npm install && npm test && rm -rf node_modules
+```
+
+Current status: typecheck clean, **63 of 63 tests passing**, **53 of 53 SQL checks passing**.
+Metro last bundled 1135 modules (not re-run since the household-scoping change).
 
 ## Status
 
@@ -101,6 +108,7 @@ kokum/
   INTEGRATIONS.md      what is actually possible with Zepto, Blinkit, Swiggy and Zomato
   DATA-MODEL.md        local store, Supabase schema, sync rules, privacy
   supabase/migrations/ schema with row-level security, plus generated seed data
+  supabase/tests/      PGlite checks of the RLS policies, triggers and join_household()
   app/
     src/
       engine/          deterministic core. No React, no I/O, fully testable.
@@ -111,7 +119,7 @@ kokum/
         cook.ts          the four depletion events
         plan.ts          weekly plan, leftovers, guest mode
         insights.ts      nutrition, spend and waste for the week
-        __tests__/       48 invariant tests, 8 invite and household tests
+        __tests__/       48 invariant tests, 15 invite and household tests
       ai/              Claude: parsing, reranking, mood interpretation
       db/              Supabase client and pantry sync
       data/            ingredient dictionary (37), recipe corpus (14, all verified)

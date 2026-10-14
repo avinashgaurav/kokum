@@ -275,4 +275,55 @@ screen to list or revoke codes, which RLS already allows.
 Verified with PGlite against a stub `auth` schema, as role `authenticated` with RLS on:
 37 checks covering invite, join, used, expired and demoted-owner codes, expiry at insert, the
 20-code cap, the cook role and the last-owner guard. Still
-not applied to a live Supabase project (Q-06).
+not applied to a live Supabase project (Q-06). **Revised by D-015:** the cap moved to a
+trigger, and the harness, now committed at `supabase/tests/rls.mjs`, runs 53 checks.
+
+---
+
+## D-015 · Race-safe invite cap and owner guard; household rows owner-written; pantries scoped per household
+**Date:** 2026-10-14 · **Status:** Locked
+
+A review found four problems in D-013 and D-014. All are fixed in place in `0001_init.sql`,
+which is still allowed because it has never been applied to a live project (Q-06).
+
+- **The 20-code cap was bypassable.** It was a `stable` function called from the insert
+  policy, which counts against the statement's snapshot: a multi-row insert or two concurrent
+  requests could each see 19 open codes. It is now a `before insert` trigger,
+  `household_invite_cap`, that takes `pg_advisory_xact_lock(hashtext(household_id))` and then
+  counts, so inserts for one household queue and each sees the last. The trigger lets a
+  non-owner through untouched, before the lock, so the insert policy rejects them with the
+  same error whatever the household's count: the cap is no oracle, and `open_invite_count()`,
+  which any signed-in user could call for any household, is gone. Expiry and ownership stay
+  in RLS.
+- **Two owners leaving at once could leave none.** `guard_household_owner()` now locks the
+  household row (`for update`) before counting the other owners, so the second removal waits
+  for the first and then sees it. A cascade from deleting the household finds no row to lock
+  and goes through as before.
+- **Any member, including a cook, could rewrite or delete the household row.** `household_rw`
+  (`for all`) is replaced by `household_read` (select, members) and `household_update` (update,
+  owners). There is no client insert or delete: `handle_new_user()` creates the household at
+  signup as security definer, and nothing in the app inserts or deletes household rows.
+- **Switching household merged one pantry into another.** The local pantry and profile now
+  belong to one household (`householdId` in local state). Switching puts them aside in a
+  per-household `stash` and restores the target's copy, or empties the pantry and pulls the
+  target's when the phone has none; leaving a household drops its copy. A sync refuses to run
+  against any household but the one the pantry belongs to, and the reducer discards a result
+  that lands after the phone has moved. Cook-log entries carry the household they were cooked
+  in and only sync there. The profile is pushed only by an owner's phone; everyone else's
+  takes the household's copy on each sync.
+
+Smaller fixes in the same pass: "Leave this household" asks first; the household switcher,
+invite and join buttons ignore taps while a request is in flight; `pickActiveHousehold` sorts
+an unparseable `joinedAt` last; `currentSession` reports a failed membership query instead of
+it reading as "No household yet".
+
+The PGlite harness is now in the repo at `supabase/tests/rls.mjs`: 53 checks, adding a
+multi-row insert past the cap, the cap's error never reaching a non-owner, the advisory lock
+and the household row lock (read from `pg_locks`; PGlite is one connection, so real
+concurrency is not exercised), the four household policies, and cascade and account deletion
+past the owner guard.
+
+**From here on, schema changes go in new migration files** (`0003_...sql` and later), never
+edits to `0001_init.sql`. Editing in place was only defensible while nothing had been applied;
+the first time a live project runs the migrations, that stops being true, and it is simplest
+to stop now.

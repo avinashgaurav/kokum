@@ -53,6 +53,11 @@ export interface CloudSession {
   householdId: string | null;
   role: MemberRole | null;
   households: Membership[];
+  /**
+   * Set when the membership query failed. The households list is then empty because it could
+   * not be read, not because there are none, and callers must say so rather than "no household".
+   */
+  error: string | null;
 }
 
 export async function currentSession(): Promise<CloudSession | null> {
@@ -65,7 +70,7 @@ export async function currentSession(): Promise<CloudSession | null> {
 
   // A trigger on auth.users creates a household and membership row for every new signup,
   // so this is populated by the time the first sign-in completes.
-  const { data: rows } = await sb
+  const { data: rows, error } = await sb
     .from('household_member')
     .select('household_id, role, joined_at, household(name)')
     .eq('user_id', user.id);
@@ -90,6 +95,7 @@ export async function currentSession(): Promise<CloudSession | null> {
     householdId,
     role: households.find((m) => m.householdId === householdId)?.role ?? null,
     households,
+    error: error ? error.message : null,
   };
 }
 
@@ -127,7 +133,7 @@ export async function leaveHousehold(householdId: string): Promise<{ ok: boolean
   } catch {
     // A stale choice is harmless: pickActiveHousehold ignores households the user has left.
   }
-  return { ok: true, message: 'Left. This phone is back on your own household.' };
+  return { ok: true, message: 'Left. This phone is back on your own household and its pantry.' };
 }
 
 /**

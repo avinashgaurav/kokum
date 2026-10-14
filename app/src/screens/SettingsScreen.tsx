@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, Chip, SectionLabel } from '../components/ui';
@@ -217,7 +217,7 @@ export function SettingsScreen() {
           careful estimate, not a sensor: when it is not sure, it asks rather than guessing.
         </Text>
         <Text style={[type.small, { color: color.muted }]}>
-          Everything stays on this device. Nothing is uploaded.
+          Everything stays on this device unless you sign in to share a pantry below.
         </Text>
       </Card>
 
@@ -241,18 +241,49 @@ function SharingCard() {
   const [invite, setInvite] = useState<Invite | null>(null);
   // A household just joined, waiting for the user to say whether this phone should switch.
   const [pendingSwitch, setPendingSwitch] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusyState] = useState(false);
+  // The state value lags a render behind, so a fast second tap could start a second request.
+  // The ref is what every handler checks.
+  const busyRef = useRef(false);
+  const setBusy = (b: boolean) => {
+    busyRef.current = b;
+    setBusyState(b);
+  };
   const [note, setNote] = useState<string | null>(null);
+
+  const loadSession = async () => {
+    const sess = await currentSession();
+    if (sess?.error) setNote(`Could not load your households: ${sess.error}`);
+    return sess;
+  };
 
   useEffect(() => {
     let cancelled = false;
-    currentSession().then((sess) => {
+    loadSession().then((sess) => {
       if (!cancelled) setSession(sess);
     });
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The local pantry belongs to one household. If this phone is now on another one (it left,
+  // or was removed), put the old one aside and bring this one's up before anything syncs.
+  useEffect(() => {
+    const active = session?.householdId;
+    if (active && state.householdId && state.householdId !== active) {
+      dispatch({ type: 'switch-household', to: active, from: state.householdId });
+    }
+  }, [session?.householdId, state.householdId, dispatch]);
+
+  // A household this phone holds no copy of starts empty; fill it straight away.
+  useEffect(() => {
+    if (session?.householdId && state.needsPull && state.householdId === session.householdId) {
+      void doSync();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.householdId, state.needsPull, state.householdId]);
 
   if (!CLOUD_CONFIGURED) {
     return (
@@ -271,18 +302,90 @@ function SharingCard() {
   }
 
   async function doSync() {
+    if (busyRef.current) return;
     setBusy(true);
-    const result = await syncPantry({
-      household: state.household,
-      pantry: state.pantry,
-      cookLog: state.cookLog,
-      leftovers: state.leftovers,
-    });
-    if (result.ok && result.merged) {
-      dispatch({ type: 'merge-pantry', pantry: result.merged });
+    try {
+      const result = await syncPantry({
+        householdId: state.householdId,
+        needsPull: state.needsPull,
+        household: state.household,
+        pantry: state.pantry,
+        cookLog: state.cookLog,
+        leftovers: state.leftovers,
+      });
+      if (result.ok) {
+        // The reducer drops this if the phone moved to another household meanwhile.
+        dispatch({
+          type: 'synced',
+          householdId: result.householdId,
+          pantry: result.pantry,
+          ...(result.household ? { household: result.household } : {}),
+        });
+      }
+      setNote(result.message);
+    } catch {
+      setNote('Sync failed. Your local pantry is untouched.');
+    } finally {
+      setBusy(false);
     }
-    setNote(result.message);
-    setBusy(false);
+  }
+
+  /** Moves this phone, and its on-screen pantry, to another of the user's households. */
+  async function switchTo(householdId: string) {
+    if (busyRef.current || !session || householdId === session.householdId) return;
+    setBusy(true);
+    try {
+      const from = session.householdId;
+      await setActiveHousehold(householdId);
+      const sess = await loadSession();
+      // Local state and session move in the same render, so the effect above never sees one
+      // without the other and switches back.
+      if (sess?.householdId) dispatch({ type: 'switch-household', to: sess.householdId, from });
+      setSession(sess);
+      setPendingSwitch(null);
+      setInvite(null);
+      if (!sess?.error) setNote(null);
+    } catch {
+      setNote('Could not switch. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function leave(householdId: string) {
+    if (busyRef.current) return;
+    setBusy(true);
+    try {
+      const r = await leaveHousehold(householdId);
+      setNote(r.message);
+      if (r.ok) {
+        setInvite(null);
+        const sess = await loadSession();
+        if (sess?.householdId) {
+          // Its pantry is no longer ours to keep.
+          dispatch({ type: 'switch-household', to: sess.householdId, from: householdId, drop: householdId });
+        }
+        setSession(sess);
+      }
+    } catch {
+      setNote('Could not leave. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function confirmLeave() {
+    if (!session?.householdId) return;
+    const id = session.householdId;
+    const name = session.households.find((m) => m.householdId === id)?.name ?? 'this household';
+    Alert.alert(
+      `Leave ${name}?`,
+      'This phone goes back to your own household and its pantry. To rejoin you need a new invite code.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Leave', style: 'destructive', onPress: () => void leave(id) },
+      ],
+    );
   }
 
   return (
@@ -298,19 +401,15 @@ function SharingCard() {
           {pendingSwitch ? (
             <>
               <Text style={[type.body, { color: color.inkSoft }]}>
-                Joined. Switch this phone to that household? The next sync merges this phone's
-                pantry into it. Your own household stays as it is, and you can switch back here.
+                Joined. Switch this phone to that household? It then shows and syncs that
+                household's pantry. Yours stays on this phone, unchanged, and comes back when you
+                switch back here.
               </Text>
               <View style={{ flexDirection: 'row', gap: space.sm }}>
                 <Button
                   label="Switch to it"
-                  onPress={async () => {
-                    await setActiveHousehold(pendingSwitch);
-                    setPendingSwitch(null);
-                    setInvite(null);
-                    setNote(null);
-                    setSession(await currentSession());
-                  }}
+                  disabled={busy}
+                  onPress={() => void switchTo(pendingSwitch)}
                 />
                 <Button label="Stay here" variant="secondary" onPress={() => setPendingSwitch(null)} />
               </View>
@@ -326,13 +425,7 @@ function SharingCard() {
                     key={h.householdId}
                     label={`${h.name} · ${h.role}`}
                     active={h.householdId === session.householdId}
-                    onPress={async () => {
-                      if (busy || h.householdId === session.householdId) return;
-                      await setActiveHousehold(h.householdId);
-                      setInvite(null);
-                      setNote(null);
-                      setSession(await currentSession());
-                    }}
+                    onPress={() => void switchTo(h.householdId)}
                   />
                 ))}
               </View>
@@ -340,16 +433,7 @@ function SharingCard() {
                 label="Leave this household"
                 variant="quiet"
                 disabled={busy || !session.householdId}
-                onPress={async () => {
-                  setBusy(true);
-                  const r = await leaveHousehold(session.householdId!);
-                  setNote(r.message);
-                  if (r.ok) {
-                    setInvite(null);
-                    setSession(await currentSession());
-                  }
-                  setBusy(false);
-                }}
+                onPress={confirmLeave}
               />
             </>
           ) : null}
@@ -373,15 +457,21 @@ function SharingCard() {
                     variant="secondary"
                     disabled={busy}
                     onPress={async () => {
+                      if (busyRef.current) return;
                       setBusy(true);
-                      const r = await createInvite(session.householdId!, role);
-                      if (r.ok) {
-                        setInvite(r.invite);
-                        setNote(null);
-                      } else {
-                        setNote(r.message);
+                      try {
+                        const r = await createInvite(session.householdId!, role);
+                        if (r.ok) {
+                          setInvite(r.invite);
+                          setNote(null);
+                        } else {
+                          setNote(r.message);
+                        }
+                      } catch {
+                        setNote('Could not create an invite. Try again.');
+                      } finally {
+                        setBusy(false);
                       }
-                      setBusy(false);
                     }}
                   />
                 ))}
@@ -407,17 +497,23 @@ function SharingCard() {
               variant="secondary"
               disabled={!code.trim() || busy}
               onPress={async () => {
+                if (busyRef.current) return;
                 setBusy(true);
-                const r = await joinHousehold(code.trim());
-                if (r.ok && r.householdId) {
-                  setNote(null);
-                  setSession(await currentSession());
-                  setPendingSwitch(r.householdId);
-                } else {
-                  setNote(r.message);
+                try {
+                  const r = await joinHousehold(code.trim());
+                  if (r.ok && r.householdId) {
+                    setNote(null);
+                    setSession(await loadSession());
+                    setPendingSwitch(r.householdId);
+                  } else {
+                    setNote(r.message);
+                  }
+                  setCode('');
+                } catch {
+                  setNote('Could not join. Try again.');
+                } finally {
+                  setBusy(false);
                 }
-                setCode('');
-                setBusy(false);
               }}
             />
           </View>
@@ -436,7 +532,9 @@ function SharingCard() {
 
           <Text style={[type.small, { color: color.muted }]}>
             When two phones disagree about an item, the more recent look at the kitchen wins.
-            Nothing is merged behind your back.
+            Each household's pantry is kept apart; switching never mixes them. The settings
+            above are shared too: an owner's phone uploads them, and everyone else's phone takes
+            the owner's on each sync.
           </Text>
         </>
       ) : (
