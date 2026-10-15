@@ -69,9 +69,10 @@ All three must pass. Beyond that, specific to this product:
    executable assertions. This suite must be impossible to skip.
 2. **Drift simulation (not built yet).** Replay 8 weeks of synthetic cook logs against a known
    ground-truth pantry and assert the model stays within tolerance.
-3. **Adversarial LLM test (not built yet).** Feed the rerank layer a response that tries to
-   change a dish state or invent an ingredient, and assert the code-computed values survive
-   untouched. Today that property rests on `reattach()` in `src/ai/rerank.ts`, which has no test.
+3. **Adversarial LLM test (partly built).** `src/engine/__tests__/reattach.test.ts` feeds
+   `reattach()` (`src/ai/reattach.ts`) a hostile reply: an invented id, a duplicate, a dropped
+   cook-now dish and a need-items dish ranked first. It asserts the id set survives and cook-now
+   dishes stay first. A response that tries to change a dish state is still untested.
 
 ## Conventions
 

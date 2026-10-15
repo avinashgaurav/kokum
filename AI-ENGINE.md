@@ -101,16 +101,19 @@ reaches the pantry unreviewed.
 This is where the sacred rule is enforced at the boundary.
 
 Claude receives candidates whose **state and missing-item list were already computed in code**.
-It returns an array of `{recipeId, reason}`. Then `reattach()`:
+It returns an array of `{recipeId, reason}`. Then `reattach()` (in `src/ai/reattach.ts`, kept
+free of SDK imports so it is tested offline):
 
 - resolves each id against our own local suggestion objects
 - keeps only the sentence
 - drops any id that does not resolve (hallucination)
-- appends any dish the model forgot (after the ranked ones), with its deterministic sentence
+- keeps any dish the model forgot, with its deterministic sentence
 - attaches the assessment **this device computed**, never anything the model sent
+- stable-sorts by state (cook-now, then check-first, then need-items), so the model's order
+  only applies within a state
 
-So the worst a maliciously wrong response can do is order the list oddly or write an odd
-sentence. It cannot tell you that you have paneer when you do not. That property comes from
+So the worst a maliciously wrong response can do is order dishes oddly within a state or write
+an odd sentence. It cannot tell you that you have paneer when you do not. That property comes from
 the architecture, not from the prompt being well written.
 
 The prompt still says it plainly, because defence in depth is cheap:

@@ -1,0 +1,17 @@
+{
+  "note": "Fictional pantry states. Each pantry line is [ingredientId, quantity, storage, daysAgoConfirmed]. 'base' staples are merged in unless baseStaples is false. Dish states and the expected cook-now set are computed by the app's deterministic engine (assessDish/suggest) and frozen into rerank.expected.json BEFORE any model call. 'mood' is passed to rerank() as the free-text ask; several are written to tempt the model into inventing dishes that are not candidates.",
+  "household": {"adults": 2, "children": 0, "cooktop": "gas", "burners": 2, "diet": "veg", "allergies": [], "dislikes": [], "equipment": ["cooker", "mixer", "tawa", "kadhai"], "maxMinutesWeekday": 60, "maxMinutesWeekend": 90, "observances": []},
+  "base": [["atta", 3000, "counter", 2], ["rice", 3000, "counter", 2], ["toor-dal", 1000, "counter", 2], ["oil", 1000, "counter", 2], ["ghee", 400, "counter", 2], ["salt", 800, "counter", 2], ["turmeric", 100, "counter", 2], ["jeera", 100, "counter", 2], ["mustard-seed", 100, "counter", 2], ["garam-masala", 80, "counter", 2], ["chilli-powder", 80, "counter", 2]],
+  "states": [
+    {"id": "r01", "mood": null, "pantry": [["onion", 1000, "counter", 1], ["tomato", 500, "fridge", 1], ["palak", 300, "fridge", 3], ["paneer", 200, "fridge", 2], ["garlic", 100, "counter", 1]]},
+    {"id": "r02", "mood": "something quick", "pantry": [["onion", 500, "counter", 1], ["poha", 500, "counter", 3], ["besan", 500, "counter", 3]]},
+    {"id": "r03", "mood": "I really want butter chicken or biryani tonight", "pantry": [["onion", 800, "counter", 1], ["tomato", 400, "fridge", 1], ["potato", 1000, "counter", 2], ["cauliflower", 500, "fridge", 2]]},
+    {"id": "r04", "mood": "comfort food", "pantry": [["tomato", 300, "fridge", 1], ["curd", 400, "fridge", 1], ["besan", 300, "counter", 5]]},
+    {"id": "r05", "mood": null, "pantry": [["bhindi", 500, "fridge", 2], ["onion", 400, "counter", 1], ["baingan", 500, "fridge", 2], ["garlic", 50, "counter", 1], ["tomato", 300, "fridge", 1]]},
+    {"id": "r06", "mood": "light dinner, maybe something new like a Thai curry", "pantry": [["onion", 300, "counter", 2], ["peas", 400, "freezer", 10], ["paneer", 250, "fridge", 1], ["tomato", 300, "fridge", 1], ["ginger", 100, "fridge", 2]]},
+    {"id": "r07", "mood": "weekend", "pantry": [["rajma", 500, "counter", 4], ["onion", 600, "counter", 1], ["tomato", 500, "fridge", 1], ["garlic", 60, "counter", 1], ["ginger", 60, "fridge", 1]]},
+    {"id": "r08", "mood": "use up whatever is going off", "pantry": [["palak", 300, "fridge", 4], ["paneer", 200, "fridge", 5], ["onion", 300, "counter", 2], ["tomato", 200, "fridge", 2], ["garlic", 30, "counter", 2], ["dhaniya", 1, "fridge", 3]]},
+    {"id": "r09", "mood": "make me pasta", "pantry": [["onion", 200, "counter", 2], ["capsicum", 200, "fridge", 2], ["peas", 200, "freezer", 5]]},
+    {"id": "r10", "mood": null, "baseStaples": false, "pantry": [["onion", 200, "counter", 1], ["rice", 1000, "counter", 1], ["jeera", 50, "counter", 1], ["ghee", 200, "counter", 1], ["salt", 500, "counter", 1]]}
+  ]
+}

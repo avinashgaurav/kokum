@@ -1,0 +1,2370 @@
+{
+  "method": "Claude Code CLI (claude -p) with the app's own prompts, schema and post-processing; not the production API path",
+  "summary": {
+    "date": "2026-10-15",
+    "configuredModel": "claude-opus-5-5",
+    "modelsAnswered": [
+      "claude-opus-5-5"
+    ],
+    "cliCalls": 30,
+    "cliErrors": 0,
+    "wallMs": {
+      "parse": 34197,
+      "rerank": 30191
+    },
+    "callLatencyMs": {
+      "parse": {
+        "n": 20,
+        "p50": 4719,
+        "p90": 6341,
+        "max": 7089
+      },
+      "rerank": {
+        "n": 10,
+        "p50": 8688,
+        "p90": 12350,
+        "max": 12350
+      }
+    },
+    "usageTotals": {
+      "input": 82175,
+      "output": 11038
+    },
+    "parse": {
+      "items": 20,
+      "itemsPassed": 20,
+      "expectedLines": 45,
+      "linesExtracted": 45,
+      "linesQtyCorrect": 45,
+      "missCategories": {}
+    },
+    "rerank": {
+      "states": 10,
+      "statesPassed": 10,
+      "rawInventedIdCount": 0,
+      "inventedIdsSurvivingReattach": 0,
+      "rawOmittedIdCount": 0,
+      "allDishesRetained": 10,
+      "cookableFirst": 10,
+      "top1Cookable": 10,
+      "checkFirstBeforeNeedItems": 10,
+      "sentenceFlags": 0,
+      "sentences": 80,
+      "sentencesMentioningItemNotInPantryOrMissing": 0,
+      "sentencesMentioningItemNotInRecipe": 8
+    },
+    "reattachAdversarial": {
+      "inventedDropped": true,
+      "duplicatesCollapsed": true,
+      "omittedRestored": true,
+      "overlongReasonReplaced": true,
+      "omittedCookNowLandsAfterNeedItems": true,
+      "finalOrder": [
+        "kanda-poha:need-items",
+        "jeera-rice:cook-now",
+        "phulka:cook-now",
+        "veg-pulao:cook-now",
+        "palak-paneer:check-first",
+        "matar-paneer:need-items",
+        "besan-chilla:need-items",
+        "dal-tadka:cook-now"
+      ]
+    },
+    "manualReview": {
+      "rerankSentencesReviewed": 80,
+      "sentencesDescribingDishWithIngredientItDoesNotUse": [
+        {
+          "state": "r01",
+          "recipeId": "veg-pulao",
+          "issue": "says it uses tomato; recipe has no tomato"
+        },
+        {
+          "state": "r03",
+          "recipeId": "veg-pulao",
+          "issue": "says made with ghee and cauliflower stirred through; recipe uses oil and has no cauliflower"
+        },
+        {
+          "state": "r09",
+          "recipeId": "kanda-poha",
+          "issue": "says it uses your peas; recipe has no peas"
+        }
+      ],
+      "sentencesClaimingUserHasItemNotInPantry": 0,
+      "note": "Heuristic flag sentencesMentioningItemNotInRecipe=8 includes 5 false positives (pairing mentions such as \"goes well with rice\", and \"aloo gobi\" matching potato/cauliflower)."
+    }
+  },
+  "parse": [
+    {
+      "id": "p01",
+      "source": "manual",
+      "pass": true,
+      "ms": 5532,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "atta",
+            "rawText": "2 kg atta",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.98
+          },
+          {
+            "ingredientId": "milk",
+            "rawText": "1 litre milk",
+            "quantity": 1000,
+            "unit": "ml",
+            "confidence": 0.98
+          },
+          {
+            "ingredientId": "egg",
+            "rawText": "6 eggs",
+            "quantity": 6,
+            "unit": "piece",
+            "confidence": 0.98
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "atta",
+            "rawText": "2 kg atta",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.98,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "milk",
+            "rawText": "1 litre milk",
+            "quantity": 1000,
+            "unit": "ml",
+            "confidence": 0.98,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "egg",
+            "rawText": "6 eggs",
+            "quantity": 6,
+            "unit": "piece",
+            "confidence": 0.98,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p02",
+      "source": "manual",
+      "pass": true,
+      "ms": 5615,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "paneer",
+            "rawText": "500g paneer",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "curd",
+            "rawText": "250 g curd",
+            "quantity": 250,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "onion",
+            "rawText": "1 kg onion",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "paneer",
+            "rawText": "500g paneer",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "curd",
+            "rawText": "250 g curd",
+            "quantity": 250,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "onion",
+            "rawText": "1 kg onion",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p03",
+      "source": "voice",
+      "pass": true,
+      "ms": 5108,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "atta",
+            "rawText": "do kilo aata",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "rice",
+            "rawText": "ek kilo chawal",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.95
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "atta",
+            "rawText": "do kilo aata",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "rice",
+            "rawText": "ek kilo chawal",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p04",
+      "source": "voice",
+      "pass": true,
+      "ms": 4537,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "tomato",
+            "rawText": "adha kilo tamatar",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "ginger",
+            "rawText": "pav kilo adrak",
+            "quantity": 250,
+            "unit": "g",
+            "confidence": 0.9
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "tomato",
+            "rawText": "adha kilo tamatar",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "ginger",
+            "rawText": "pav kilo adrak",
+            "quantity": 250,
+            "unit": "g",
+            "confidence": 0.9,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p05",
+      "source": "voice",
+      "pass": true,
+      "ms": 4696,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "potato",
+            "rawText": "dedh kilo aloo",
+            "quantity": 1500,
+            "unit": "g",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "dhaniya",
+            "rawText": "do bunch dhaniya",
+            "quantity": 2,
+            "unit": "bunch",
+            "confidence": 0.95
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "potato",
+            "rawText": "dedh kilo aloo",
+            "quantity": 1500,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "dhaniya",
+            "rawText": "do bunch dhaniya",
+            "quantity": 2,
+            "unit": "bunch",
+            "confidence": 0.95,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p06",
+      "source": "manual",
+      "pass": true,
+      "ms": 4703,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "toor-dal",
+            "rawText": "toor dal 1kg",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "moong-dal",
+            "rawText": "moong dal 500g",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "besan",
+            "rawText": "besan 500 g",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "toor-dal",
+            "rawText": "toor dal 1kg",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "moong-dal",
+            "rawText": "moong dal 500g",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "besan",
+            "rawText": "besan 500 g",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p07",
+      "source": "manual",
+      "pass": true,
+      "ms": 4633,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "oil",
+            "rawText": "1 L sunflower oil",
+            "quantity": 1000,
+            "unit": "ml",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "ghee",
+            "rawText": "500 ml ghee",
+            "quantity": 500,
+            "unit": "ml",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "oil",
+            "rawText": "1 L sunflower oil",
+            "quantity": 1000,
+            "unit": "ml",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "ghee",
+            "rawText": "500 ml ghee",
+            "quantity": 500,
+            "unit": "ml",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p08",
+      "source": "manual",
+      "pass": true,
+      "ms": 4444,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "bhindi",
+            "rawText": "500 g bhindi",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": [
+          "1 kg chicken",
+          "2 loaves bread"
+        ]
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "bhindi",
+            "rawText": "500 g bhindi",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": [
+          "1 kg chicken",
+          "2 loaves bread"
+        ]
+      }
+    },
+    {
+      "id": "p09",
+      "source": "voice",
+      "pass": true,
+      "ms": 4720,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "lemon",
+            "rawText": "teen nimbu",
+            "quantity": 3,
+            "unit": "piece",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "egg",
+            "rawText": "char anda",
+            "quantity": 4,
+            "unit": "piece",
+            "confidence": 0.95
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "lemon",
+            "rawText": "teen nimbu",
+            "quantity": 3,
+            "unit": "piece",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "egg",
+            "rawText": "char anda",
+            "quantity": 4,
+            "unit": "piece",
+            "confidence": 0.95,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p10",
+      "source": "manual",
+      "pass": true,
+      "ms": 4822,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "palak",
+            "rawText": "spinach 250g",
+            "quantity": 250,
+            "unit": "g",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "cauliflower",
+            "rawText": "1 cauliflower (about 600 g)",
+            "quantity": 600,
+            "unit": "g",
+            "confidence": 0.8
+          },
+          {
+            "ingredientId": "peas",
+            "rawText": "frozen green peas 500 g",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.9
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "palak",
+            "rawText": "spinach 250g",
+            "quantity": 250,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "cauliflower",
+            "rawText": "1 cauliflower (about 600 g)",
+            "quantity": 600,
+            "unit": "g",
+            "confidence": 0.8,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "peas",
+            "rawText": "frozen green peas 500 g",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.9,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p11",
+      "source": "manual",
+      "pass": true,
+      "ms": 4942,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "curry-leaves",
+            "rawText": "kadi patta 1 bunch",
+            "quantity": 1,
+            "unit": "bunch",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "green-chilli",
+            "rawText": "hari mirch 100 g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.98
+          },
+          {
+            "ingredientId": "turmeric",
+            "rawText": "haldi 100 g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.98
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "curry-leaves",
+            "rawText": "kadi patta 1 bunch",
+            "quantity": 1,
+            "unit": "bunch",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "green-chilli",
+            "rawText": "hari mirch 100 g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.98,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "turmeric",
+            "rawText": "haldi 100 g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.98,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p12",
+      "source": "voice",
+      "pass": true,
+      "ms": 5766,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "dhaniya",
+            "rawText": "daniya ek bunch",
+            "quantity": 1,
+            "unit": "bunch",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "capsicum",
+            "rawText": "shimla mirch paanch sau gram",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.95
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "dhaniya",
+            "rawText": "daniya ek bunch",
+            "quantity": 1,
+            "unit": "bunch",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "capsicum",
+            "rawText": "shimla mirch paanch sau gram",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p13",
+      "source": "manual",
+      "pass": true,
+      "ms": 4669,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "baingan",
+            "rawText": "sawa kilo baingan",
+            "quantity": 1250,
+            "unit": "g",
+            "confidence": 0.95
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "baingan",
+            "rawText": "sawa kilo baingan",
+            "quantity": 1250,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p14",
+      "source": "manual",
+      "pass": true,
+      "ms": 6341,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "jeera",
+            "rawText": "Jeera 100g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "mustard-seed",
+            "rawText": "rai 100g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.95
+          },
+          {
+            "ingredientId": "kasuri-methi",
+            "rawText": "kasuri methi 50g",
+            "quantity": 50,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "garam-masala",
+            "rawText": "garam masala 100 g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "jeera",
+            "rawText": "Jeera 100g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "mustard-seed",
+            "rawText": "rai 100g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.95,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "kasuri-methi",
+            "rawText": "kasuri methi 50g",
+            "quantity": 50,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "garam-masala",
+            "rawText": "garam masala 100 g",
+            "quantity": 100,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p15",
+      "source": "manual",
+      "pass": true,
+      "ms": 4519,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "sugar",
+            "rawText": "\u091a\u0940\u0928\u0940 1 \u0915\u093f\u0932\u094b",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "salt",
+            "rawText": "\u0928\u092e\u0915 1 \u0915\u093f\u0932\u094b",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "sugar",
+            "rawText": "\u091a\u0940\u0928\u0940 1 \u0915\u093f\u0932\u094b",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "salt",
+            "rawText": "\u0928\u092e\u0915 1 \u0915\u093f\u0932\u094b",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p16",
+      "source": "manual",
+      "pass": true,
+      "ms": 4557,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "rajma",
+            "rawText": "2 kg rajma",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": [
+          "dishwash liquid 1",
+          "toilet paper 4 rolls"
+        ]
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "rajma",
+            "rawText": "2 kg rajma",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": [
+          "dishwash liquid 1",
+          "toilet paper 4 rolls"
+        ]
+      }
+    },
+    {
+      "id": "p17",
+      "source": "manual",
+      "pass": true,
+      "ms": 4192,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "poha",
+            "rawText": "1 packet poha",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.5
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "poha",
+            "rawText": "1 packet poha",
+            "quantity": 500,
+            "unit": "g",
+            "confidence": 0.5,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p18",
+      "source": "voice",
+      "pass": true,
+      "ms": 7089,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "cauliflower",
+            "rawText": "paune kilo gobi",
+            "quantity": 750,
+            "unit": "g",
+            "confidence": 0.9
+          },
+          {
+            "ingredientId": "milk",
+            "rawText": "2 litre doodh",
+            "quantity": 2000,
+            "unit": "ml",
+            "confidence": 0.95
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "cauliflower",
+            "rawText": "paune kilo gobi",
+            "quantity": 750,
+            "unit": "g",
+            "confidence": 0.9,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "milk",
+            "rawText": "2 litre doodh",
+            "quantity": 2000,
+            "unit": "ml",
+            "confidence": 0.95,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p19",
+      "source": "list-photo",
+      "pass": true,
+      "ms": 5344,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "atta",
+            "rawText": "atta - 5 kg",
+            "quantity": 5000,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "toor-dal",
+            "rawText": "toor dal - 1 kg",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "onion",
+            "rawText": "onion - 2 kg",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.97
+          },
+          {
+            "ingredientId": "milk",
+            "rawText": "milk - 2 L",
+            "quantity": 2000,
+            "unit": "ml",
+            "confidence": 0.97
+          }
+        ],
+        "unparsed": []
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "atta",
+            "rawText": "atta - 5 kg",
+            "quantity": 5000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "toor-dal",
+            "rawText": "toor dal - 1 kg",
+            "quantity": 1000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "onion",
+            "rawText": "onion - 2 kg",
+            "quantity": 2000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": null
+          },
+          {
+            "ingredientId": "milk",
+            "rawText": "milk - 2 L",
+            "quantity": 2000,
+            "unit": "ml",
+            "confidence": 0.97,
+            "pricePaise": null
+          }
+        ],
+        "totalPaise": null,
+        "unparsed": []
+      }
+    },
+    {
+      "id": "p20",
+      "source": "bill",
+      "pass": true,
+      "ms": 4681,
+      "misses": [],
+      "output": {
+        "lines": [
+          {
+            "ingredientId": "rice",
+            "rawText": "Basmati rice 5 kg",
+            "quantity": 5000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": 45000
+          },
+          {
+            "ingredientId": "ghee",
+            "rawText": "Ghee 1 L",
+            "quantity": 1000,
+            "unit": "ml",
+            "confidence": 0.97,
+            "pricePaise": 65000
+          }
+        ],
+        "unparsed": [],
+        "totalPaise": 112500
+      },
+      "raw": {
+        "lines": [
+          {
+            "ingredientId": "rice",
+            "rawText": "Basmati rice 5 kg",
+            "quantity": 5000,
+            "unit": "g",
+            "confidence": 0.97,
+            "pricePaise": 45000
+          },
+          {
+            "ingredientId": "ghee",
+            "rawText": "Ghee 1 L",
+            "quantity": 1000,
+            "unit": "ml",
+            "confidence": 0.97,
+            "pricePaise": 65000
+          }
+        ],
+        "totalPaise": 112500,
+        "unparsed": []
+      }
+    }
+  ],
+  "rerank": [
+    {
+      "id": "r01",
+      "mood": null,
+      "pass": true,
+      "ms": 9954,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "An easy, comforting 25 minutes with everything already in your kitchen, and it pairs well with rice or phulka on your second burner."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "Ready in 20 minutes from what you have, and it's the natural partner for a pot of dal."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "You have the atta and ghee for fresh phulkas in 20 minutes, a little more hands-on but very satisfying."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "A one-pot meal in 30 minutes using your onion and tomato, nothing to buy."
+        },
+        {
+          "recipeId": "palak-paneer",
+          "state": "check-first",
+          "reason": "A wholesome 30-minute dish if your palak and paneer are still fresh, so check them before you start."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "A light 15-minute option once you pick up besan."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "Quick and light in 15 minutes, you just need poha."
+        },
+        {
+          "recipeId": "matar-paneer",
+          "state": "need-items",
+          "reason": "A good one to make for guests once you have green peas and ginger."
+        }
+      ],
+      "contentFlags": [
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "rice",
+          "reason": "An easy, comforting 25 minutes with everything already in your kitchen, and it pairs well with rice or phulka on your second burner.",
+          "recipeId": "dal-tadka"
+        },
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "tomato",
+          "reason": "A one-pot meal in 30 minutes using your onion and tomato, nothing to buy.",
+          "recipeId": "veg-pulao"
+        }
+      ]
+    },
+    {
+      "id": "r02",
+      "mood": "something quick",
+      "pass": true,
+      "ms": 7719,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "kanda-poha",
+          "state": "cook-now",
+          "reason": "Ready in 15 minutes with low effort, and the poha, onion, rai and haldi you already have are all it needs."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "cook-now",
+          "reason": "A light 15-minute option you can make right now from besan and onion, cooked on one burner."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "Takes just 20 minutes of easy cooking with rice, jeera and ghee from your pantry."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Your atta covers it in 20 minutes, though rolling them out takes a bit more effort than the quicker picks."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "You can make it now, but at 30 minutes it is the slowest of the dishes that need no shopping."
+        },
+        {
+          "recipeId": "dal-tadka",
+          "state": "need-items",
+          "reason": "Needs Tomato."
+        },
+        {
+          "recipeId": "bhindi-masala",
+          "state": "need-items",
+          "reason": "Needs Bhindi."
+        },
+        {
+          "recipeId": "kadhi",
+          "state": "need-items",
+          "reason": "Needs Curd."
+        }
+      ],
+      "contentFlags": []
+    },
+    {
+      "id": "r03",
+      "mood": "I really want butter chicken or biryani tonight",
+      "pass": true,
+      "ms": 12361,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "This is the closest you can get to biryani tonight: fragrant spiced rice made with ghee and garam masala, with potato and cauliflower stirred through, ready in 30 minutes from what you already have."
+        },
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "If you want something rich and comforting like butter chicken, this takes 25 easy minutes and finishes with a ghee and jeera tadka over tomato and onion."
+        },
+        {
+          "recipeId": "aloo-gobi",
+          "state": "cook-now",
+          "reason": "Your potatoes and cauliflower make a hearty, well-spiced sabzi in 30 minutes, and it goes well with rice or phulkas."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "This takes only 20 minutes and needs one burner, so you can cook it next to the dal for a full meal on your two-burner stove."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Your atta gives you fresh rotis in 20 minutes to scoop up the dal or aloo gobi."
+        },
+        {
+          "recipeId": "bhindi-masala",
+          "state": "need-items",
+          "reason": "You only need to buy bhindi for this, and everything else is already in your kitchen."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "You only need to buy besan for this quick, light 15-minute option."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "You only need to buy poha for this, and it's light enough that it suits breakfast more than a craving dinner."
+        }
+      ],
+      "contentFlags": [
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "ghee",
+          "reason": "This is the closest you can get to biryani tonight: fragrant spiced rice made with ghee and garam masala, with potato and cauliflower stirred through, ready in 30 minutes from what you already have.",
+          "recipeId": "veg-pulao"
+        },
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "cauliflower",
+          "reason": "This is the closest you can get to biryani tonight: fragrant spiced rice made with ghee and garam masala, with potato and cauliflower stirred through, ready in 30 minutes from what you already have.",
+          "recipeId": "veg-pulao"
+        },
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "rice",
+          "reason": "Your potatoes and cauliflower make a hearty, well-spiced sabzi in 30 minutes, and it goes well with rice or phulkas.",
+          "recipeId": "aloo-gobi"
+        },
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "potato",
+          "reason": "Your atta gives you fresh rotis in 20 minutes to scoop up the dal or aloo gobi.",
+          "recipeId": "phulka"
+        },
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "cauliflower",
+          "reason": "Your atta gives you fresh rotis in 20 minutes to scoop up the dal or aloo gobi.",
+          "recipeId": "phulka"
+        }
+      ]
+    },
+    {
+      "id": "r04",
+      "mood": "comfort food",
+      "pass": true,
+      "ms": 8688,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "This is the classic comfort pick, ready in 25 easy minutes with the toor dal, tomato, ghee and jeera you already have."
+        },
+        {
+          "recipeId": "kadhi",
+          "state": "cook-now",
+          "reason": "Warm and soothing, this uses your curd and besan and takes about 35 minutes with everything on hand."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "It takes 20 low-effort minutes and fits on your second burner, so it goes well with the dal or kadhi."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Fresh from your atta in about 20 minutes, they make a homely partner for either curry if you'd rather have roti than rice."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "cook-now",
+          "reason": "Your quickest option at 15 minutes with everything in the kitchen, though it's lighter than a full comfort meal."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "need-items",
+          "reason": "You only need onion for this one."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "You need poha and onion for this one."
+        },
+        {
+          "recipeId": "aloo-gobi",
+          "state": "need-items",
+          "reason": "You need potato and cauliflower for this one."
+        }
+      ],
+      "contentFlags": [
+        {
+          "kind": "mentions-item-not-in-this-recipe",
+          "ingredient": "rice",
+          "reason": "Fresh from your atta in about 20 minutes, they make a homely partner for either curry if you'd rather have roti than rice.",
+          "recipeId": "phulka"
+        }
+      ]
+    },
+    {
+      "id": "r05",
+      "mood": null,
+      "pass": true,
+      "ms": 8772,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "At 25 minutes and the lowest effort on the list, it's an easy, comforting choice for a weeknight, and you have everything for it."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "Ready in 20 minutes from what you already have, and it fits on your second burner next to a pot of dal."
+        },
+        {
+          "recipeId": "baingan-bharta",
+          "state": "cook-now",
+          "reason": "It uses the baingan, onion, tomato and garlic you have, and is worth the 40 minutes if you want something more satisfying."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Your atta and ghee are enough to make fresh rotis in about 20 minutes to go with whatever else you cook."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "A one-pot meal in 30 minutes, made entirely from what's in your kitchen, so it works well with only two burners."
+        },
+        {
+          "recipeId": "bhindi-masala",
+          "state": "check-first",
+          "reason": "It takes 25 minutes, but check that your bhindi is still good before you start."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "Quick and light at 15 minutes, but you'd need to buy besan."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "A light 15-minute dish, but you'd need to buy poha."
+        }
+      ],
+      "contentFlags": []
+    },
+    {
+      "id": "r06",
+      "mood": "light dinner, maybe something new like a Thai curry",
+      "pass": true,
+      "ms": 8239,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "The lightest dinner you can make right now, ready in 25 minutes with toor dal and a jeera-ghee tadka from what you already have."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "Takes 20 low-effort minutes and pairs easily with dal for a simple, light plate."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "A one-pot meal in 30 minutes using your rice and green peas, filling without being heavy."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Thin, oil-free rotis from your atta that keep a dal dinner light, done in about 20 minutes."
+        },
+        {
+          "recipeId": "matar-paneer",
+          "state": "cook-now",
+          "reason": "You have everything for it, including paneer and peas, but at 35 minutes in a rich gravy it is heavier than the light dinner you asked for."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "Light and done in 15 minutes, but you would need to buy poha."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "A quick, light 15-minute option, but you would need to buy besan."
+        },
+        {
+          "recipeId": "palak-paneer",
+          "state": "need-items",
+          "reason": "You would need to buy palak and garlic."
+        }
+      ],
+      "contentFlags": []
+    },
+    {
+      "id": "r07",
+      "mood": "weekend",
+      "pass": true,
+      "ms": 8306,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "rajma-masala",
+          "state": "cook-now",
+          "reason": "You asked for a weekend meal, and this slow 50-minute comfort dish can be made entirely from what's in your kitchen."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "It's ready in 20 minutes on your second burner, so it can cook alongside a curry and be done at the same time."
+        },
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "A relaxed 25-minute comfort dish you can make with what you have, with a ghee tadka that feels a little more special on a weekend."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Your atta and ghee make fresh, hot ones in 20 minutes to go with whatever curry you make."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "A one-pot, 30-minute rice dish you can cook now if you want something easy that still feels like a proper meal."
+        },
+        {
+          "recipeId": "bhindi-masala",
+          "state": "need-items",
+          "reason": "You just need Bhindi."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "You just need Besan."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "You just need Poha."
+        }
+      ],
+      "contentFlags": []
+    },
+    {
+      "id": "r08",
+      "mood": "use up whatever is going off",
+      "pass": true,
+      "ms": 9227,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "dal-tadka",
+          "state": "cook-now",
+          "reason": "Ready to cook in 25 easy minutes, and a good way to use up fresh tomato, onion, garlic and dhaniya before they turn."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "Ready to cook in 30 minutes, and it can take whatever fresh vegetables need using up in one pot."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "Ready in 20 low-effort minutes, and it goes well with a dal on your second burner."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "Ready to make with what you have in 20 minutes, a fresh side for whatever you cook to use up your vegetables."
+        },
+        {
+          "recipeId": "palak-paneer",
+          "state": "need-items",
+          "reason": "You need to buy Paneer for this one."
+        },
+        {
+          "recipeId": "aloo-gobi",
+          "state": "need-items",
+          "reason": "You need to buy Potato and Cauliflower for this one."
+        },
+        {
+          "recipeId": "baingan-bharta",
+          "state": "need-items",
+          "reason": "You need to buy Baingan for this one."
+        },
+        {
+          "recipeId": "matar-paneer",
+          "state": "need-items",
+          "reason": "You need to buy Paneer, Green peas and Ginger for this one."
+        }
+      ],
+      "contentFlags": []
+    },
+    {
+      "id": "r09",
+      "mood": "make me pasta",
+      "pass": true,
+      "ms": 7442,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "veg-pulao",
+          "state": "cook-now",
+          "reason": "There's no pasta in your kitchen, so this is the closest swap: a one-pot dish of grain and vegetables you can make right now with your onion, capsicum and green peas in 30 minutes."
+        },
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "You have everything for it, and it's an easy 20-minute bowl that needs almost no effort."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "cook-now",
+          "reason": "You can make these now from your atta in about 20 minutes, and they go well with whatever else you cook."
+        },
+        {
+          "recipeId": "dal-tadka",
+          "state": "need-items",
+          "reason": "This comforting dish takes 25 minutes, and all you need to buy is tomato."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "This is the quickest option at 15 minutes, but you need besan."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "It's a light 15-minute dish that uses your onion and peas, but you need poha."
+        },
+        {
+          "recipeId": "bhindi-masala",
+          "state": "need-items",
+          "reason": "This everyday side takes 25 minutes, but you need bhindi."
+        },
+        {
+          "recipeId": "aloo-gobi",
+          "state": "need-items",
+          "reason": "This is a filling 30-minute dish, but you need potato and cauliflower."
+        }
+      ],
+      "contentFlags": []
+    },
+    {
+      "id": "r10",
+      "mood": null,
+      "pass": true,
+      "ms": 5469,
+      "misses": [],
+      "rawInventedIds": [],
+      "rawDuplicateIds": [],
+      "rawOmittedIds": [],
+      "retained": true,
+      "cookFirst": true,
+      "top1Cook": true,
+      "checkBeforeNeed": true,
+      "sentenceFlags": [],
+      "finalOrder": [
+        {
+          "recipeId": "jeera-rice",
+          "state": "cook-now",
+          "reason": "Everything it needs is already in your kitchen, and it's on the table in 20 minutes with almost no effort."
+        },
+        {
+          "recipeId": "phulka",
+          "state": "need-items",
+          "reason": "The only thing you're missing is atta."
+        },
+        {
+          "recipeId": "veg-pulao",
+          "state": "need-items",
+          "reason": "You're missing garam masala and cooking oil."
+        },
+        {
+          "recipeId": "dal-tadka",
+          "state": "need-items",
+          "reason": "You're missing toor dal, tomato and haldi."
+        },
+        {
+          "recipeId": "besan-chilla",
+          "state": "need-items",
+          "reason": "You're missing besan, haldi and cooking oil."
+        },
+        {
+          "recipeId": "bhindi-masala",
+          "state": "need-items",
+          "reason": "You're missing bhindi, haldi and cooking oil."
+        },
+        {
+          "recipeId": "kanda-poha",
+          "state": "need-items",
+          "reason": "You're missing poha, rai, haldi and cooking oil."
+        },
+        {
+          "recipeId": "aloo-gobi",
+          "state": "need-items",
+          "reason": "You're missing potato, cauliflower, haldi and cooking oil."
+        }
+      ],
+      "contentFlags": []
+    }
+  ],
+  "reattachAdversarial": {
+    "inventedDropped": true,
+    "duplicatesCollapsed": true,
+    "omittedRestored": true,
+    "overlongReasonReplaced": true,
+    "omittedCookNowLandsAfterNeedItems": true,
+    "finalOrder": [
+      "kanda-poha:need-items",
+      "jeera-rice:cook-now",
+      "phulka:cook-now",
+      "veg-pulao:cook-now",
+      "palak-paneer:check-first",
+      "matar-paneer:need-items",
+      "besan-chilla:need-items",
+      "dal-tadka:cook-now"
+    ]
+  },
+  "calls": [
+    {
+      "label": "p03",
+      "ms": 5103,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"atta\",\"rawText\":\"do kilo aata\",\"quantity\":2000,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"rice\",\"rawText\":\"ek kilo chawal\",\"quantity\":1000,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 215,
+        "cache_read_input_tokens": 750,
+        "cache_creation_input_tokens": 2015,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.020578,
+      "num_turns": 2
+    },
+    {
+      "label": "p01",
+      "ms": 5531,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"atta\",\"rawText\":\"2 kg atta\",\"quantity\":2000,\"unit\":\"g\",\"confidence\":0.98,\"pricePaise\":null},{\"ingredientId\":\"milk\",\"rawText\":\"1 litre milk\",\"quantity\":1000,\"unit\":\"ml\",\"confidence\":0.98,\"pricePaise\":null},{\"ingredientId\":\"egg\",\"rawText\":\"6 eggs\",\"quantity\":6,\"unit\":\"piece\"",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 268,
+        "cache_read_input_tokens": 2301,
+        "cache_creation_input_tokens": 359,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0087002,
+      "num_turns": 2
+    },
+    {
+      "label": "p02",
+      "ms": 5611,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"paneer\",\"rawText\":\"500g paneer\",\"quantity\":500,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"curd\",\"rawText\":\"250 g curd\",\"quantity\":250,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"onion\",\"rawText\":\"1 kg onion\",\"quantity\":1000,\"unit\"",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 265,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 625,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0107144,
+      "num_turns": 2
+    },
+    {
+      "label": "p04",
+      "ms": 4537,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"tomato\",\"rawText\":\"adha kilo tamatar\",\"quantity\":500,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"ginger\",\"rawText\":\"pav kilo adrak\",\"quantity\":250,\"unit\":\"g\",\"confidence\":0.9,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 218,
+        "cache_read_input_tokens": 2142,
+        "cache_creation_input_tokens": 625,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0097964,
+      "num_turns": 2
+    },
+    {
+      "label": "p05",
+      "ms": 4696,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"potato\",\"rawText\":\"dedh kilo aloo\",\"quantity\":1500,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"dhaniya\",\"rawText\":\"do bunch dhaniya\",\"quantity\":2,\"unit\":\"bunch\",\"confidence\":0.95,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 223,
+        "cache_read_input_tokens": 2142,
+        "cache_creation_input_tokens": 627,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0099124,
+      "num_turns": 2
+    },
+    {
+      "label": "p06",
+      "ms": 4703,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"toor-dal\",\"rawText\":\"toor dal 1kg\",\"quantity\":1000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"moong-dal\",\"rawText\":\"moong dal 500g\",\"quantity\":500,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"besan\",\"rawText\":\"besan 500 g\",\"quantit",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 275,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 630,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.010954400000000001,
+      "num_turns": 2
+    },
+    {
+      "label": "p07",
+      "ms": 4632,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"oil\",\"rawText\":\"1 L sunflower oil\",\"quantity\":1000,\"unit\":\"ml\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"ghee\",\"rawText\":\"500 ml ghee\",\"quantity\":500,\"unit\":\"ml\",\"confidence\":0.97,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 219,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 624,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0097864,
+      "num_turns": 2
+    },
+    {
+      "label": "p08",
+      "ms": 4444,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"bhindi\",\"rawText\":\"500 g bhindi\",\"quantity\":500,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[\"1 kg chicken\",\"2 loaves bread\"]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 176,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 632,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.008990399999999999,
+      "num_turns": 2
+    },
+    {
+      "label": "p09",
+      "ms": 4719,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"lemon\",\"rawText\":\"teen nimbu\",\"quantity\":3,\"unit\":\"piece\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"egg\",\"rawText\":\"char anda\",\"quantity\":4,\"unit\":\"piece\",\"confidence\":0.95,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 211,
+        "cache_read_input_tokens": 2142,
+        "cache_creation_input_tokens": 617,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.009592400000000001,
+      "num_turns": 2
+    },
+    {
+      "label": "p10",
+      "ms": 4821,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"palak\",\"rawText\":\"spinach 250g\",\"quantity\":250,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"cauliflower\",\"rawText\":\"1 cauliflower (about 600 g)\",\"quantity\":600,\"unit\":\"g\",\"confidence\":0.8,\"pricePaise\":null},{\"ingredientId\":\"peas\",\"rawText\":\"frozen green",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 280,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 639,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0111264,
+      "num_turns": 2
+    },
+    {
+      "label": "p11",
+      "ms": 4941,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"curry-leaves\",\"rawText\":\"kadi patta 1 bunch\",\"quantity\":1,\"unit\":\"bunch\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"green-chilli\",\"rawText\":\"hari mirch 100 g\",\"quantity\":100,\"unit\":\"g\",\"confidence\":0.98,\"pricePaise\":null},{\"ingredientId\":\"turmeric\",\"rawText\":\"ha",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 285,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 636,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.011202400000000001,
+      "num_turns": 2
+    },
+    {
+      "label": "p12",
+      "ms": 5766,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"dhaniya\",\"rawText\":\"daniya ek bunch\",\"quantity\":1,\"unit\":\"bunch\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"capsicum\",\"rawText\":\"shimla mirch paanch sau gram\",\"quantity\":500,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 227,
+        "cache_read_input_tokens": 2142,
+        "cache_creation_input_tokens": 629,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0100084,
+      "num_turns": 2
+    },
+    {
+      "label": "p13",
+      "ms": 4669,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"baingan\",\"rawText\":\"sawa kilo baingan\",\"quantity\":1250,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 162,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 616,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0085824,
+      "num_turns": 2
+    },
+    {
+      "label": "p15",
+      "ms": 4518,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"sugar\",\"rawText\":\"\u091a\u0940\u0928\u0940 1 \u0915\u093f\u0932\u094b\",\"quantity\":1000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"salt\",\"rawText\":\"\u0928\u092e\u0915 1 \u0915\u093f\u0932\u094b\",\"quantity\":1000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 221,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 627,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0098504,
+      "num_turns": 2
+    },
+    {
+      "label": "p14",
+      "ms": 6341,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"jeera\",\"rawText\":\"Jeera 100g\",\"quantity\":100,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"mustard-seed\",\"rawText\":\"rai 100g\",\"quantity\":100,\"unit\":\"g\",\"confidence\":0.95,\"pricePaise\":null},{\"ingredientId\":\"kasuri-methi\",\"rawText\":\"kasuri methi 50g\",\"quan",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 337,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 639,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0122664,
+      "num_turns": 2
+    },
+    {
+      "label": "p16",
+      "ms": 4557,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"rajma\",\"rawText\":\"2 kg rajma\",\"quantity\":2000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[\"dishwash liquid 1\",\"toilet paper 4 rolls\"]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 182,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 637,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0091504,
+      "num_turns": 2
+    },
+    {
+      "label": "p17",
+      "ms": 4192,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"poha\",\"rawText\":\"1 packet poha\",\"quantity\":500,\"unit\":\"g\",\"confidence\":0.5,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 157,
+        "cache_read_input_tokens": 2032,
+        "cache_creation_input_tokens": 613,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.008458400000000001,
+      "num_turns": 2
+    },
+    {
+      "label": "p18",
+      "ms": 7089,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"cauliflower\",\"rawText\":\"paune kilo gobi\",\"quantity\":750,\"unit\":\"g\",\"confidence\":0.9,\"pricePaise\":null},{\"ingredientId\":\"milk\",\"rawText\":\"2 litre doodh\",\"quantity\":2000,\"unit\":\"ml\",\"confidence\":0.95,\"pricePaise\":null}],\"totalPaise\":null,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 219,
+        "cache_read_input_tokens": 2142,
+        "cache_creation_input_tokens": 625,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0098164,
+      "num_turns": 2
+    },
+    {
+      "label": "p19",
+      "ms": 5341,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"atta\",\"rawText\":\"atta - 5 kg\",\"quantity\":5000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"toor-dal\",\"rawText\":\"toor dal - 1 kg\",\"quantity\":1000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":null},{\"ingredientId\":\"onion\",\"rawText\":\"onion - 2 kg\",\"quantity\":",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 336,
+        "cache_read_input_tokens": 750,
+        "cache_creation_input_tokens": 2280,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.025117999999999998,
+      "num_turns": 2
+    },
+    {
+      "label": "p20",
+      "ms": 4680,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"lines\":[{\"ingredientId\":\"rice\",\"rawText\":\"Basmati rice 5 kg\",\"quantity\":5000,\"unit\":\"g\",\"confidence\":0.97,\"pricePaise\":45000},{\"ingredientId\":\"ghee\",\"rawText\":\"Ghee 1 L\",\"quantity\":1000,\"unit\":\"ml\",\"confidence\":0.97,\"pricePaise\":65000}],\"totalPaise\":112500,\"unparsed\":[]}",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 225,
+        "cache_read_input_tokens": 750,
+        "cache_creation_input_tokens": 2335,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.023337999999999998,
+      "num_turns": 2
+    },
+    {
+      "label": "r02",
+      "ms": 7709,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"kanda-poha\",\"reason\":\"Ready in 15 minutes with low effort, and the poha, onion, rai and haldi you already have are all it needs.\"},{\"recipeId\":\"besan-chilla\",\"reason\":\"A light 15-minute option you can make right now from besan and onion, cooked on one burner.\"},{\"recipeId\":\"j",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 574,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 2706,
+        "thinking_tokens": 171
+      },
+      "cost_usd_list": 0.033136,
+      "num_turns": 2
+    },
+    {
+      "label": "r01",
+      "ms": 9951,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"dal-tadka\",\"reason\":\"An easy, comforting 25 minutes with everything already in your kitchen, and it pairs well with rice or phulka on your second burner.\"},{\"recipeId\":\"jeera-rice\",\"reason\":\"Ready in 20 minutes from what you have, and it's the natural partner for a pot of dal",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 744,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 2766,
+        "thinking_tokens": 302
+      },
+      "cost_usd_list": 0.03701599999999999,
+      "num_turns": 2
+    },
+    {
+      "label": "r03",
+      "ms": 12350,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"veg-pulao\",\"reason\":\"This is the closest you can get to biryani tonight: fragrant spiced rice made with ghee and garam masala, with potato and cauliflower stirred through, ready in 30 minutes from what you already have.\"},{\"recipeId\":\"dal-tadka\",\"reason\":\"If you want somethin",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 792,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 2736,
+        "thinking_tokens": 253
+      },
+      "cost_usd_list": 0.037736000000000006,
+      "num_turns": 2
+    },
+    {
+      "label": "r04",
+      "ms": 8688,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"dal-tadka\",\"reason\":\"This is the classic comfort pick, ready in 25 easy minutes with the toor dal, tomato, ghee and jeera you already have.\"},{\"recipeId\":\"kadhi\",\"reason\":\"Warm and soothing, this uses your curd and besan and takes about 35 minutes with everything on hand.\"},{",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 540,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1828,
+        "thinking_tokens": 101
+      },
+      "cost_usd_list": 0.0256124,
+      "num_turns": 2
+    },
+    {
+      "label": "r05",
+      "ms": 8772,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"dal-tadka\",\"reason\":\"At 25 minutes and the lowest effort on the list, it's an easy, comforting choice for a weeknight, and you have everything for it.\"},{\"recipeId\":\"jeera-rice\",\"reason\":\"Ready in 20 minutes from what you already have, and it fits on your second burner next t",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 709,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1827,
+        "thinking_tokens": 228
+      },
+      "cost_usd_list": 0.0289844,
+      "num_turns": 2
+    },
+    {
+      "label": "r06",
+      "ms": 8239,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"dal-tadka\",\"reason\":\"The lightest dinner you can make right now, ready in 25 minutes with toor dal and a jeera-ghee tadka from what you already have.\"},{\"recipeId\":\"jeera-rice\",\"reason\":\"Takes 20 low-effort minutes and pairs easily with dal for a simple, light plate.\"},{\"reci",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 635,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1851,
+        "thinking_tokens": 177
+      },
+      "cost_usd_list": 0.027696400000000003,
+      "num_turns": 2
+    },
+    {
+      "label": "r07",
+      "ms": 8305,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"rajma-masala\",\"reason\":\"You asked for a weekend meal, and this slow 50-minute comfort dish can be made entirely from what's in your kitchen.\"},{\"recipeId\":\"jeera-rice\",\"reason\":\"It's ready in 20 minutes on your second burner, so it can cook alongside a curry and be done at th",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 596,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1826,
+        "thinking_tokens": 167
+      },
+      "cost_usd_list": 0.0267164,
+      "num_turns": 2
+    },
+    {
+      "label": "r08",
+      "ms": 9227,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"dal-tadka\",\"reason\":\"Ready to cook in 25 easy minutes, and a good way to use up fresh tomato, onion, garlic and dhaniya before they turn.\"},{\"recipeId\":\"veg-pulao\",\"reason\":\"Ready to cook in 30 minutes, and it can take whatever fresh vegetables need using up in one pot.\"},{\"r",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 788,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1884,
+        "thinking_tokens": 355
+      },
+      "cost_usd_list": 0.031020400000000004,
+      "num_turns": 2
+    },
+    {
+      "label": "r09",
+      "ms": 7442,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"veg-pulao\",\"reason\":\"There's no pasta in your kitchen, so this is the closest swap: a one-pot dish of grain and vegetables you can make right now with your onion, capsicum and green peas in 30 minutes.\"},{\"recipeId\":\"jeera-rice\",\"reason\":\"You have everything for it, and it's ",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 588,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1845,
+        "thinking_tokens": 128
+      },
+      "cost_usd_list": 0.0267084,
+      "num_turns": 2
+    },
+    {
+      "label": "r10",
+      "ms": 5468,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"ranked\":[{\"recipeId\":\"jeera-rice\",\"reason\":\"Everything it needs is already in your kitchen, and it's on the table in 20 minutes with almost no effort.\"},{\"recipeId\":\"phulka\",\"reason\":\"The only thing you're missing is atta.\"},{\"recipeId\":\"veg-pulao\",\"reason\":\"You're missing garam masala and cooking",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 371,
+        "cache_read_input_tokens": 902,
+        "cache_creation_input_tokens": 1889,
+        "thinking_tokens": 0
+      },
+      "cost_usd_list": 0.0227204,
+      "num_turns": 2
+    }
+  ]
+}
