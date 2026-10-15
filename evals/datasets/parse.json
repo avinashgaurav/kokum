@@ -1,0 +1,25 @@
+{
+  "note": "Fictional grocery inputs. Expected answers written before any model run. qty in the dictionary's base unit. 'flexQty' means quantity is not scored (no weight given) but confidence must be <= maxConfidence. 'oov' lists out-of-vocabulary items that must NOT resolve to any ingredient id.",
+  "items": [
+    {"id": "p01", "source": "manual", "text": "2 kg atta, 1 litre milk, 6 eggs", "expect": [["atta", 2000], ["milk", 1000], ["egg", 6]]},
+    {"id": "p02", "source": "manual", "text": "500g paneer\n250 g curd\n1 kg onion", "expect": [["paneer", 500], ["curd", 250], ["onion", 1000]]},
+    {"id": "p03", "source": "voice", "text": "do kilo aata aur ek kilo chawal", "expect": [["atta", 2000], ["rice", 1000]]},
+    {"id": "p04", "source": "voice", "text": "adha kilo tamatar, pav kilo adrak", "expect": [["tomato", 500], ["ginger", 250]]},
+    {"id": "p05", "source": "voice", "text": "dedh kilo aloo aur do bunch dhaniya", "expect": [["potato", 1500], ["dhaniya", 2]]},
+    {"id": "p06", "source": "manual", "text": "toor dal 1kg, moong dal 500g, besan 500 g", "expect": [["toor-dal", 1000], ["moong-dal", 500], ["besan", 500]]},
+    {"id": "p07", "source": "manual", "text": "1 L sunflower oil\n500 ml ghee", "expect": [["oil", 1000], ["ghee", 500]]},
+    {"id": "p08", "source": "manual", "text": "1 kg chicken, 2 loaves bread, 500 g bhindi", "expect": [["bhindi", 500]], "oov": ["chicken", "bread"]},
+    {"id": "p09", "source": "voice", "text": "teen nimbu, char anda", "expect": [["lemon", 3], ["egg", 4]]},
+    {"id": "p10", "source": "manual", "text": "spinach 250g, 1 cauliflower (about 600 g), frozen green peas 500 g", "expect": [["palak", 250], ["cauliflower", 600], ["peas", 500]]},
+    {"id": "p11", "source": "manual", "text": "kadi patta 1 bunch, hari mirch 100 g, haldi 100 g", "expect": [["curry-leaves", 1], ["green-chilli", 100], ["turmeric", 100]]},
+    {"id": "p12", "source": "voice", "text": "daniya ek bunch, shimla mirch paanch sau gram", "expect": [["dhaniya", 1], ["capsicum", 500]]},
+    {"id": "p13", "source": "manual", "text": "sawa kilo baingan", "expect": [["baingan", 1250]]},
+    {"id": "p14", "source": "manual", "text": "Jeera 100g, rai 100g, kasuri methi 50g, garam masala 100 g", "expect": [["jeera", 100], ["mustard-seed", 100], ["kasuri-methi", 50], ["garam-masala", 100]]},
+    {"id": "p15", "source": "manual", "text": "चीनी 1 किलो, नमक 1 किलो", "expect": [["sugar", 1000], ["salt", 1000]]},
+    {"id": "p16", "source": "manual", "text": "dishwash liquid 1, 2 kg rajma, toilet paper 4 rolls", "expect": [["rajma", 2000]], "oov": ["dishwash", "toilet paper"]},
+    {"id": "p17", "source": "manual", "text": "1 packet poha", "expect": [["poha", null]], "flexQty": ["poha"], "maxConfidence": 0.6},
+    {"id": "p18", "source": "voice", "text": "paune kilo gobi aur 2 litre doodh", "expect": [["cauliflower", 750], ["milk", 2000]]},
+    {"id": "p19", "source": "list-photo", "image": "list-photo.png", "lines": ["Shopping list", "atta - 5 kg", "toor dal - 1 kg", "onion - 2 kg", "milk - 2 L"], "expect": [["atta", 5000], ["toor-dal", 1000], ["onion", 2000], ["milk", 2000]]},
+    {"id": "p20", "source": "bill", "image": "bill.png", "lines": ["GREENLEAF GROCERS (fictional)", "Invoice #4471", "Basmati rice 5 kg    Rs 450.00", "Ghee 1 L             Rs 650.00", "Delivery fee         Rs 25.00", "TOTAL                Rs 1125.00"], "expect": [["rice", 5000], ["ghee", 1000]], "oov": ["delivery"], "expectPricePaise": {"rice": 45000, "ghee": 65000}, "expectTotalPaise": 112500}
+  ]
+}

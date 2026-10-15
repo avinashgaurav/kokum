@@ -23,6 +23,19 @@ Product brief (user, problem, metrics, cost): [docs/PRD.md](docs/PRD.md).
 | Diet, allergy, cooktop and fasting filters; depletion and scaling | Code (`app/src/engine/`) | Hard rules and arithmetic are never a judgment call. |
 | Order the shortlist and write one sentence per dish | Model (`app/src/ai/rerank.ts`) | Tone and context are what a model is good at. Code drops any recipe id the model invents, re-adds any dish it skipped, and reattaches the state this device computed. |
 
+## Evals
+
+20 fictional grocery lists and receipts, and 10 pantry states with 80 candidate dishes. Method and every miss: [EVALS.md](EVALS.md).
+
+| Measure | Before fix | After fix |
+|---|---|---|
+| Grocery lists parsed fully correct | 20 / 20 | 20 / 20 |
+| Invented recipe ids reaching the user | 0 | 0 |
+| Dish sentences naming an ingredient the dish does not use | 3 / 80 | 0 / 80 |
+| Cook-now dishes kept first even if the model reorders them | No | Yes, enforced in code |
+
+Run through the Claude Code CLI with the app's own prompts and schema, not the production API path; an API rerun is planned.
+
 ## Run it
 
 ```bash

@@ -1,0 +1,826 @@
+[
+  {
+    "id": "r01",
+    "candidates": [
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "palak-paneer",
+        "state": "check-first",
+        "missing": [],
+        "uncertain": [
+          "palak",
+          "paneer"
+        ]
+      },
+      {
+        "recipeId": "matar-paneer",
+        "state": "need-items",
+        "missing": [
+          "peas",
+          "ginger"
+        ],
+        "uncertain": [
+          "paneer"
+        ]
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "besan-chilla",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "matar-paneer",
+        "palak-paneer",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "dal-tadka",
+        "jeera-rice",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r02",
+    "candidates": [
+      {
+        "recipeId": "besan-chilla",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "need-items",
+        "missing": [
+          "tomato"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "bhindi-masala",
+        "state": "need-items",
+        "missing": [
+          "bhindi"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kadhi",
+        "state": "need-items",
+        "missing": [
+          "curd"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "besan-chilla",
+        "bhindi-masala",
+        "dal-tadka",
+        "jeera-rice",
+        "kadhi",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "besan-chilla",
+        "jeera-rice",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r03",
+    "candidates": [
+      {
+        "recipeId": "aloo-gobi",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "bhindi-masala",
+        "state": "need-items",
+        "missing": [
+          "bhindi"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "aloo-gobi",
+        "besan-chilla",
+        "bhindi-masala",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "aloo-gobi",
+        "dal-tadka",
+        "jeera-rice",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r04",
+    "candidates": [
+      {
+        "recipeId": "kadhi",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "need-items",
+        "missing": [
+          "onion"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha",
+          "onion"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "aloo-gobi",
+        "state": "need-items",
+        "missing": [
+          "potato",
+          "cauliflower"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "aloo-gobi",
+        "besan-chilla",
+        "dal-tadka",
+        "jeera-rice",
+        "kadhi",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "besan-chilla",
+        "dal-tadka",
+        "jeera-rice",
+        "kadhi",
+        "phulka"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r05",
+    "candidates": [
+      {
+        "recipeId": "baingan-bharta",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "bhindi-masala",
+        "state": "check-first",
+        "missing": [],
+        "uncertain": [
+          "bhindi"
+        ]
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "baingan-bharta",
+        "besan-chilla",
+        "bhindi-masala",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "baingan-bharta",
+        "dal-tadka",
+        "jeera-rice",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r06",
+    "candidates": [
+      {
+        "recipeId": "matar-paneer",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "palak-paneer",
+        "state": "need-items",
+        "missing": [
+          "palak",
+          "garlic"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "besan-chilla",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "matar-paneer",
+        "palak-paneer",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "dal-tadka",
+        "jeera-rice",
+        "matar-paneer",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r07",
+    "candidates": [
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "rajma-masala",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "bhindi-masala",
+        "state": "need-items",
+        "missing": [
+          "bhindi"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "besan-chilla",
+        "bhindi-masala",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "phulka",
+        "rajma-masala",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "dal-tadka",
+        "jeera-rice",
+        "phulka",
+        "rajma-masala",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r08",
+    "candidates": [
+      {
+        "recipeId": "dal-tadka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "palak-paneer",
+        "state": "need-items",
+        "missing": [
+          "paneer"
+        ],
+        "uncertain": [
+          "palak"
+        ]
+      },
+      {
+        "recipeId": "baingan-bharta",
+        "state": "need-items",
+        "missing": [
+          "baingan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "aloo-gobi",
+        "state": "need-items",
+        "missing": [
+          "potato",
+          "cauliflower"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "matar-paneer",
+        "state": "need-items",
+        "missing": [
+          "paneer",
+          "peas",
+          "ginger"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "aloo-gobi",
+        "baingan-bharta",
+        "dal-tadka",
+        "jeera-rice",
+        "matar-paneer",
+        "palak-paneer",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "dal-tadka",
+        "jeera-rice",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r09",
+    "candidates": [
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "need-items",
+        "missing": [
+          "tomato"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "bhindi-masala",
+        "state": "need-items",
+        "missing": [
+          "bhindi"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "aloo-gobi",
+        "state": "need-items",
+        "missing": [
+          "potato",
+          "cauliflower"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "aloo-gobi",
+        "besan-chilla",
+        "bhindi-masala",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "jeera-rice",
+        "phulka",
+        "veg-pulao"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  },
+  {
+    "id": "r10",
+    "candidates": [
+      {
+        "recipeId": "jeera-rice",
+        "state": "cook-now",
+        "missing": [],
+        "uncertain": []
+      },
+      {
+        "recipeId": "phulka",
+        "state": "need-items",
+        "missing": [
+          "atta"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "veg-pulao",
+        "state": "need-items",
+        "missing": [
+          "garam-masala",
+          "oil"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "besan-chilla",
+        "state": "need-items",
+        "missing": [
+          "besan",
+          "turmeric",
+          "oil"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "dal-tadka",
+        "state": "need-items",
+        "missing": [
+          "toor-dal",
+          "tomato",
+          "turmeric"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "bhindi-masala",
+        "state": "need-items",
+        "missing": [
+          "bhindi",
+          "turmeric",
+          "oil"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "kanda-poha",
+        "state": "need-items",
+        "missing": [
+          "poha",
+          "mustard-seed",
+          "turmeric",
+          "oil"
+        ],
+        "uncertain": []
+      },
+      {
+        "recipeId": "aloo-gobi",
+        "state": "need-items",
+        "missing": [
+          "potato",
+          "cauliflower",
+          "turmeric",
+          "oil"
+        ],
+        "uncertain": []
+      }
+    ],
+    "expect": {
+      "sameIdSet": [
+        "aloo-gobi",
+        "besan-chilla",
+        "bhindi-masala",
+        "dal-tadka",
+        "jeera-rice",
+        "kanda-poha",
+        "phulka",
+        "veg-pulao"
+      ],
+      "cookNowFirst": [
+        "jeera-rice"
+      ],
+      "inventedIdsInOutput": 0
+    }
+  }
+]

@@ -1,6 +1,9 @@
 import { INGREDIENT_INDEX } from '../data/ingredients';
 import type { Household, Suggestion } from '../engine/types';
 import { MODEL, getClient, noKey, toFailure, type AiResult } from './client';
+import { reattach, type Reranked } from './reattach';
+
+export type { Reranked } from './reattach';
 
 /**
  * The LLM layer. It may reorder and describe. It may not decide anything.
@@ -11,12 +14,6 @@ import { MODEL, getClient, noKey, toFailure, type AiResult } from './client';
  * Even a maliciously wrong response can only produce an odd order or an odd sentence; it can
  * never tell the user they have paneer when they do not. See AGENTS.md.
  */
-
-export interface Reranked {
-  suggestion: Suggestion;
-  /** Claude's sentence, or the deterministic one if the call failed or was ignored. */
-  reason: string;
-}
 
 const SCHEMA = {
   type: 'object',
@@ -51,7 +48,8 @@ Writing the sentence:
 - One sentence. Plain, warm, specific. No preamble, no emoji, no exclamation marks.
 - Lead with the reason it suits tonight: something about to spoil, how long it takes, how long since they made it, how it fits the mood they asked for.
 - For a dish that needs shopping, name what is missing and nothing more.
-- Do not restate the dish name. They can already see it.`;
+- Do not restate the dish name. They can already see it.
+- Only mention ingredients that are in this dish: its "ingredients" or "optionalIngredients" list. Never describe a dish as using something that is not on those lists, even if the pantry has it.`;
 
 function payload(
   suggestions: Suggestion[],
@@ -66,6 +64,12 @@ function payload(
     minutes: s.recipe.minutes,
     effort: s.recipe.effort,
     moods: s.recipe.moods,
+    ingredients: s.recipe.ingredients
+      .filter((ri) => ri.core)
+      .map((ri) => INGREDIENT_INDEX.get(ri.ingredientId)?.name ?? ri.ingredientId),
+    optionalIngredients: s.recipe.ingredients
+      .filter((ri) => !ri.core)
+      .map((ri) => INGREDIENT_INDEX.get(ri.ingredientId)?.name ?? ri.ingredientId),
     state: s.assessment.state,
     missing: s.assessment.missing.map(
       (m) => INGREDIENT_INDEX.get(m.ingredientId)?.name ?? m.ingredientId,
@@ -139,43 +143,6 @@ export async function rerank(
   } catch (err) {
     return toFailure<Reranked[]>(err);
   }
-}
-
-/**
- * The enforcement point.
- *
- * Walks the model's ordering, resolves each id against our own suggestion objects, and keeps
- * only the sentence. A hallucinated id resolves to nothing and is dropped. Any dish the model
- * forgot is appended in its original position. The assessment attached to each result is the
- * one this device computed, never anything the model sent back.
- */
-function reattach(
-  suggestions: Suggestion[],
-  ranked: { recipeId: string; reason: string }[],
-): Reranked[] {
-  const byId = new Map(suggestions.map((s) => [s.recipe.id, s]));
-  const out: Reranked[] = [];
-  const used = new Set<string>();
-
-  for (const entry of ranked) {
-    const s = byId.get(entry.recipeId);
-    if (!s || used.has(entry.recipeId)) continue;
-    used.add(entry.recipeId);
-    out.push({ suggestion: s, reason: sanitise(entry.reason) || s.reason });
-  }
-
-  // Anything the model dropped still gets shown, with its deterministic sentence.
-  for (const s of suggestions) {
-    if (!used.has(s.recipe.id)) out.push({ suggestion: s, reason: s.reason });
-  }
-
-  return out;
-}
-
-function sanitise(reason: string): string {
-  const one = reason.trim().replace(/\s+/g, ' ');
-  if (one.length === 0 || one.length > 200) return '';
-  return one;
 }
 
 /**
