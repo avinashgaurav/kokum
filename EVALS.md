@@ -1,10 +1,10 @@
 # Kokum AI evals
 
-First-pass quality evals for the two model calls Kokum depends on: grocery parsing (`app/src/ai/parse.ts`) and tonight's rerank (`app/src/ai/rerank.ts`). Run on 2026-10-15, then rerun the same day after the fixes in commit `0b89b6f` (see "Before and after the fix").
+First-pass quality evals for the two model calls Kokum depends on: grocery parsing (`app/src/ai/parse.ts`) and tonight's rerank (`app/src/ai/rerank.ts`). Run on 2026-10-15, then rerun the same day after the fixes, which ship in the same PR (see "Before and after the fix").
 
 **Method note.** Measured via the Claude Code CLI with the app's own prompts and schema, not the production API path; an API rerun is planned.
 
-The harness calls the app's real `parseText`, `parseImage` and `rerank`. That means the real system prompts, closed vocabulary, JSON schemas, `normalise()` and `reattach()` all run. Only the transport changes: `evals/harness/claude-cli.mjs` is a stand-in for `@anthropic-ai/sdk` that runs `claude -p` with `--system-prompt`, `--json-schema`, `--tools ""`, `--strict-mcp-config`, `--setting-sources ""`, `--no-session-persistence` and `--model claude-opus-5-5`. The eval commits change no production file; the fixes are in a separate commit.
+The harness calls the app's real `parseText`, `parseImage` and `rerank`. That means the real system prompts, closed vocabulary, JSON schemas, `normalise()` and `reattach()` all run. Only the transport changes: `evals/harness/claude-cli.mjs` is a stand-in for `@anthropic-ai/sdk` that runs `claude -p` with `--system-prompt`, `--json-schema`, `--tools ""`, `--strict-mcp-config`, `--setting-sources ""`, `--no-session-persistence` and `--model claude-opus-5-5`.
 
 Differences from the API path, so the numbers are read correctly:
 
@@ -93,7 +93,7 @@ Also reported:
 
 ## Before and after the fix
 
-Fix commit `0b89b6f` (production code, separate from the eval commits):
+The fixes (production code, in the same PR as these results):
 
 - `reattach()` moved to `app/src/ai/reattach.ts` (no SDK imports) and now stable-sorts by dish state after applying the model's order. A regression test built from the hostile reply above is in `app/src/engine/__tests__/reattach.test.ts`.
 - The rerank payload now carries each dish's `ingredients` and `optionalIngredients`, and the prompt says: "Only mention ingredients that are in this dish: its "ingredients" or "optionalIngredients" list."
@@ -151,7 +151,7 @@ bun --no-install evals/harness/freeze-rerank.ts   # freezes engine expectations 
 bun --no-install evals/harness/run.ts all         # 30 CLI calls; writes evals/results/<date>-claude-cli.json
 EVAL_TAG=after-fix bun --no-install evals/harness/run.ts all   # same, written with an -after-fix suffix
 bun --no-install evals/harness/rescore.ts evals/results/<date>-claude-cli.json   # optional, no model
-rm -rf node_modules
+rm -rf node_modules/@anthropic-ai/sdk node_modules/expo-secure-store   # removes only the two shims
 ```
 
 Requires Bun and a logged-in `claude` CLI. Single sets: `run.ts parse`, `run.ts rerank`, `run.ts adversarial` (offline).

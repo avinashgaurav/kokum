@@ -31,7 +31,7 @@ Product brief (user, problem, metrics, cost): [docs/PRD.md](docs/PRD.md).
 |---|---|---|
 | Grocery lists parsed fully correct | 20 / 20 | 20 / 20 |
 | Invented recipe ids reaching the user | 0 | 0 |
-| Dish sentences naming an ingredient the dish does not use | 3 / 80 | 0 / 80 |
+| Dish sentences naming an ingredient the dish does not use (manual read of 80 sentences; the prompt rule was written from these misses, so tuned on this set) | 3 / 80 | 0 / 80 |
 | Cook-now dishes kept first even if the model reorders them | No | Yes, enforced in code |
 
 Run through the Claude Code CLI with the app's own prompts and schema, not the production API path; an API rerun is planned.

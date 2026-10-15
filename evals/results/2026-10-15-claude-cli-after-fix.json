@@ -42,7 +42,7 @@
       "sentencesMentioningItemNotInPantryOrMissing": 0,
       "sentencesMentioningItemNotInRecipe": 4
     },
-    "fixCommit": "0b89b6f",
+    "fix": "shipped in the same PR as this result file",
     "manualReview": {
       "rerankSentencesReviewed": 80,
       "sentencesDescribingDishWithIngredientItDoesNotUse": [],
