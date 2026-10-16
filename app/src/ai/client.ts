@@ -1,6 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
 
 /**
  * Claude client.
@@ -31,7 +30,9 @@ export const MODEL = 'claude-opus-5-5';
 let cached: Anthropic | null = null;
 let cachedKey: string | null = null;
 
-const isWeb = Platform.OS === 'web';
+// A DOM means react-native-web. Checked directly rather than via Platform so this file keeps
+// no react-native import (the eval harness runs it under Bun with only the SDK shimmed).
+const isWeb = typeof document !== 'undefined';
 
 export async function getApiKey(): Promise<string | null> {
   try {
