@@ -30,9 +30,15 @@ export const MODEL = 'claude-opus-5-5';
 let cached: Anthropic | null = null;
 let cachedKey: string | null = null;
 
-// A DOM means react-native-web. Checked directly rather than via Platform so this file keeps
-// no react-native import (the eval harness runs it under Bun with only the SDK shimmed).
-const isWeb = typeof document !== 'undefined';
+// A DOM plus browser storage, and not React Native, means react-native-web. Checked directly
+// rather than via Platform so this file keeps no react-native import (the eval harness runs it
+// under Bun with only the SDK shimmed). The navigator.product test keeps a native bundle running
+// in a Chrome remote debugger on SecureStore.
+const isWeb =
+  typeof document !== 'undefined' &&
+  typeof window !== 'undefined' &&
+  typeof window.localStorage !== 'undefined' &&
+  (typeof navigator === 'undefined' || navigator.product !== 'ReactNative');
 
 export async function getApiKey(): Promise<string | null> {
   try {
@@ -46,8 +52,12 @@ export async function getApiKey(): Promise<string | null> {
 export async function setApiKey(key: string): Promise<void> {
   const trimmed = key.trim();
   if (isWeb) {
-    if (trimmed) window.localStorage.setItem(KEY_SLOT, trimmed);
-    else window.localStorage.removeItem(KEY_SLOT);
+    try {
+      if (trimmed) window.localStorage.setItem(KEY_SLOT, trimmed);
+      else window.localStorage.removeItem(KEY_SLOT);
+    } catch {
+      throw new Error('This browser blocked local storage, so the key could not be saved.');
+    }
   } else if (trimmed) await SecureStore.setItemAsync(KEY_SLOT, trimmed);
   else await SecureStore.deleteItemAsync(KEY_SLOT);
   cached = null;
@@ -66,9 +76,9 @@ export async function getClient(): Promise<Anthropic | null> {
 
   cached = new Anthropic({
     apiKey: key,
-    // React Native looks like a browser to the SDK's environment check. The usual reason that
-    // check exists is to stop a key being shipped to untrusted clients; here the key belongs
-    // to the person holding the phone, so the check is not protecting anyone.
+    // On native, React Native only looks like a browser to the SDK. On web it is a browser. Either
+    // way the key is the user's own, typed in by them, and is sent only to api.anthropic.com
+    // (this is the only client in the app), so allowing browser use exposes nothing of ours.
     dangerouslyAllowBrowser: true,
   });
   cachedKey = key;

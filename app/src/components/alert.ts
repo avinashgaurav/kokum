@@ -14,15 +14,18 @@ function alert(title: string, message?: string, buttons?: AlertButton[]): void {
     return;
   }
   const text = message ? `${title}\n\n${message}` : title;
-  const cancel = buttons?.find((b) => b.style === 'cancel');
-  const action = buttons?.find((b) => b.style !== 'cancel');
-  if (cancel && action) {
+  // Web shows at most two choices (OK and Cancel) and loses destructive styling. With two or more
+  // buttons it always asks: the marked cancel button, or else the first, is the Cancel choice, so
+  // a destructive action never runs without a yes.
+  if (buttons && buttons.length >= 2) {
+    const cancel = buttons.find((b) => b.style === 'cancel') ?? buttons[0]!;
+    const action = buttons.find((b) => b !== cancel)!;
     if (window.confirm(text)) action.onPress?.();
     else cancel.onPress?.();
     return;
   }
   window.alert(text);
-  (action ?? cancel)?.onPress?.();
+  buttons?.[0]?.onPress?.();
 }
 
 export const Alert = { alert };
