@@ -13,6 +13,10 @@ import * as SecureStore from 'expo-secure-store';
  * is the wrong shape for a multi-tenant product, which would proxy through a server that holds
  * one key and rate-limits per account. If Kokum ever ships to other people, this file is the
  * seam where that proxy goes: swap the base URL, drop the key handling, nothing else moves.
+ *
+ * On web there is no keychain (expo-secure-store has no web implementation), so the key goes
+ * in this browser's localStorage instead. Same trade-off, weaker storage: anyone with access
+ * to this browser profile can read it. Remove it in Setup when done.
  */
 
 const KEY_SLOT = 'kokum.anthropic.key';
@@ -26,8 +30,19 @@ export const MODEL = 'claude-opus-5-5';
 let cached: Anthropic | null = null;
 let cachedKey: string | null = null;
 
+// A DOM plus browser storage, and not React Native, means react-native-web. Checked directly
+// rather than via Platform so this file keeps no react-native import (the eval harness runs it
+// under Bun with only the SDK shimmed). The navigator.product test keeps a native bundle running
+// in a Chrome remote debugger on SecureStore.
+const isWeb =
+  typeof document !== 'undefined' &&
+  typeof window !== 'undefined' &&
+  typeof window.localStorage !== 'undefined' &&
+  (typeof navigator === 'undefined' || navigator.product !== 'ReactNative');
+
 export async function getApiKey(): Promise<string | null> {
   try {
+    if (isWeb) return window.localStorage.getItem(KEY_SLOT);
     return await SecureStore.getItemAsync(KEY_SLOT);
   } catch {
     return null;
@@ -36,7 +51,14 @@ export async function getApiKey(): Promise<string | null> {
 
 export async function setApiKey(key: string): Promise<void> {
   const trimmed = key.trim();
-  if (trimmed) await SecureStore.setItemAsync(KEY_SLOT, trimmed);
+  if (isWeb) {
+    try {
+      if (trimmed) window.localStorage.setItem(KEY_SLOT, trimmed);
+      else window.localStorage.removeItem(KEY_SLOT);
+    } catch {
+      throw new Error('This browser blocked local storage, so the key could not be saved.');
+    }
+  } else if (trimmed) await SecureStore.setItemAsync(KEY_SLOT, trimmed);
   else await SecureStore.deleteItemAsync(KEY_SLOT);
   cached = null;
   cachedKey = null;
@@ -54,9 +76,9 @@ export async function getClient(): Promise<Anthropic | null> {
 
   cached = new Anthropic({
     apiKey: key,
-    // React Native looks like a browser to the SDK's environment check. The usual reason that
-    // check exists is to stop a key being shipped to untrusted clients; here the key belongs
-    // to the person holding the phone, so the check is not protecting anyone.
+    // On native, React Native only looks like a browser to the SDK. On web it is a browser. Either
+    // way the key is the user's own, typed in by them, and is sent only to api.anthropic.com
+    // (this is the only client in the app), so allowing browser use exposes nothing of ours.
     dangerouslyAllowBrowser: true,
   });
   cachedKey = key;

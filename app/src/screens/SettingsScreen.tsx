@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert } from '../components/alert';
 
 import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, Chip, SectionLabel } from '../components/ui';
@@ -686,7 +687,12 @@ function ApiKeyCard() {
   }, []);
 
   async function save() {
-    await setApiKey(key);
+    try {
+      await setApiKey(key);
+    } catch (e) {
+      Alert.alert('Key not saved', e instanceof Error ? e.message : 'Saving the key failed.');
+      return;
+    }
     setSaved(key.trim().length > 0);
     setKey('');
     setEditing(false);
@@ -736,8 +742,10 @@ function ApiKeyCard() {
           />
           <Button label="Save key" onPress={save} disabled={!key.trim()} />
           <Text style={[type.small, { color: color.muted }]}>
-            Stored in your phone's keychain. It goes to Anthropic and nowhere else. Everything
-            else in Kokum works without it.
+            {Platform.OS === 'web'
+              ? "Stored unencrypted in this browser's local storage. Use a key with a low spend limit, and remove it when you are done."
+              : "Stored in your phone's keychain."}{' '}
+            It goes to Anthropic and nowhere else. Everything else in Kokum works without it.
           </Text>
         </>
       )}

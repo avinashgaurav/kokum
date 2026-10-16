@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert } from '../components/alert';
 
 import { color, radius, space, type, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, Chip, Empty, SectionLabel, StateBadge } from '../components/ui';
