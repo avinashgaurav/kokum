@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 /**
  * Claude client.
@@ -13,6 +14,10 @@ import * as SecureStore from 'expo-secure-store';
  * is the wrong shape for a multi-tenant product, which would proxy through a server that holds
  * one key and rate-limits per account. If Kokum ever ships to other people, this file is the
  * seam where that proxy goes: swap the base URL, drop the key handling, nothing else moves.
+ *
+ * On web there is no keychain (expo-secure-store has no web implementation), so the key goes
+ * in this browser's localStorage instead. Same trade-off, weaker storage: anyone with access
+ * to this browser profile can read it. Remove it in Setup when done.
  */
 
 const KEY_SLOT = 'kokum.anthropic.key';
@@ -26,8 +31,11 @@ export const MODEL = 'claude-opus-5-5';
 let cached: Anthropic | null = null;
 let cachedKey: string | null = null;
 
+const isWeb = Platform.OS === 'web';
+
 export async function getApiKey(): Promise<string | null> {
   try {
+    if (isWeb) return window.localStorage.getItem(KEY_SLOT);
     return await SecureStore.getItemAsync(KEY_SLOT);
   } catch {
     return null;
@@ -36,7 +44,10 @@ export async function getApiKey(): Promise<string | null> {
 
 export async function setApiKey(key: string): Promise<void> {
   const trimmed = key.trim();
-  if (trimmed) await SecureStore.setItemAsync(KEY_SLOT, trimmed);
+  if (isWeb) {
+    if (trimmed) window.localStorage.setItem(KEY_SLOT, trimmed);
+    else window.localStorage.removeItem(KEY_SLOT);
+  } else if (trimmed) await SecureStore.setItemAsync(KEY_SLOT, trimmed);
   else await SecureStore.deleteItemAsync(KEY_SLOT);
   cached = null;
   cachedKey = null;

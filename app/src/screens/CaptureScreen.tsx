@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { Alert } from '../components/alert';
 
 import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, SectionLabel } from '../components/ui';

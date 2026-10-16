@@ -2,7 +2,7 @@
 
 Recipe apps tell you to cook something and halfway through you find you are out of paneer, so Kokum tracks what is actually in your kitchen and only promises dishes it can back.
 
-No hosted demo yet: it is an Expo app, so run it locally with Expo Go (see Quick start).
+**Live demo:** https://kokum-six.vercel.app (runs in your browser; your pantry is saved on this device; AI ranking needs your own Claude key in Settings)
 
 <img src="docs/demo.gif" alt="Kokum on web: tonight's Cook now dishes, a comfort mood showing Check first dishes, the pantry with items that need a look, and the week plan." width="300" />
 

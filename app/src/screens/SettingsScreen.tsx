@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert } from '../components/alert';
 
 import { color, radius, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, Chip, SectionLabel } from '../components/ui';
@@ -736,8 +737,10 @@ function ApiKeyCard() {
           />
           <Button label="Save key" onPress={save} disabled={!key.trim()} />
           <Text style={[type.small, { color: color.muted }]}>
-            Stored in your phone's keychain. It goes to Anthropic and nowhere else. Everything
-            else in Kokum works without it.
+            {Platform.OS === 'web'
+              ? "Stored in this browser's local storage, on this device only."
+              : "Stored in your phone's keychain."}{' '}
+            It goes to Anthropic and nowhere else. Everything else in Kokum works without it.
           </Text>
         </>
       )}
