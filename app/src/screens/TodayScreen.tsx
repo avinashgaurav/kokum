@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import { color, radius, shadow, space, type, TOUCH_PRIMARY } from '../theme';
+import { color, FAB_CLEARANCE, FAB_INSET, FAB_SIZE, radius, shadow, space, type, TOUCH_PRIMARY } from '../theme';
 import { Button, Card, Chip, Empty, SectionLabel, StateBadge } from '../components/ui';
 import { Mark } from '../components/Mark';
 import { useStore } from '../store/useStore';
@@ -185,8 +185,6 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
             />
           </View>
         ) : null}
-
-        <View style={{ height: 96 }} />
       </ScrollView>
 
       {/* Thumb zone. The one floating action, bottom right. */}
@@ -287,7 +285,7 @@ function DishCard({
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.canvas },
-  scroll: { padding: space.base, gap: space.base },
+  scroll: { padding: space.base, gap: space.base, paddingBottom: FAB_CLEARANCE },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   input: {
     minHeight: TOUCH_PRIMARY,
@@ -310,10 +308,10 @@ const s = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: space.base,
-    bottom: space.lg,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: FAB_INSET,
+    width: FAB_SIZE,
+    height: FAB_SIZE,
+    borderRadius: FAB_SIZE / 2,
     backgroundColor: color.petrol,
     alignItems: 'center',
     justifyContent: 'center',

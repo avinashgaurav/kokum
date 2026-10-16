@@ -1,7 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { color, radius, shadow, space, type, TOUCH_MIN, TOUCH_PRIMARY } from '../theme';
+import {
+  color,
+  FAB_CLEARANCE,
+  FAB_INSET,
+  FAB_SIZE,
+  radius,
+  shadow,
+  space,
+  type,
+  TOUCH_MIN,
+  TOUCH_PRIMARY,
+} from '../theme';
 import { Button, Card, SectionLabel } from '../components/ui';
 import { StockMark } from '../components/Mark';
 import { useStore } from '../store/useStore';
@@ -153,8 +164,6 @@ export function PantryScreen({ navigation }: { navigation: { navigate: (s: strin
           </Card>
         </View>
       ) : null}
-
-      <View style={{ height: 96 }} />
     </ScrollView>
 
     {/* Capture is the highest-value repeated action, so it gets the thumb-zone slot. */}
@@ -290,7 +299,7 @@ function WeeklyCheck({
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.canvas },
-  scroll: { padding: space.base, gap: space.base },
+  scroll: { padding: space.base, gap: space.base, paddingBottom: FAB_CLEARANCE },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   input: {
     minHeight: TOUCH_PRIMARY,
@@ -316,10 +325,10 @@ const s = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: space.base,
-    bottom: space.lg,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: FAB_INSET,
+    width: FAB_SIZE,
+    height: FAB_SIZE,
+    borderRadius: FAB_SIZE / 2,
     backgroundColor: color.petrol,
     alignItems: 'center',
     justifyContent: 'center',
