@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer, type Theme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -14,7 +14,7 @@ import { SettingsScreen } from './src/screens/SettingsScreen';
 import { CaptureScreen } from './src/screens/CaptureScreen';
 import { WeekScreen } from './src/screens/WeekScreen';
 import { Mark } from './src/components/Mark';
-import { color, type } from './src/theme';
+import { color, type, WEB_COLUMN_MAX } from './src/theme';
 
 /**
  * Three tabs, never more: Today, Pantry, Order. Setup rides along as a fourth entry only
@@ -78,56 +78,88 @@ function TabGlyph({ focused, filled }: { focused: boolean; filled: number }) {
   );
 }
 
+/**
+ * On web, a wide window shows the app as a centred phone-width column: screens, floating
+ * buttons and the tab bar all sit inside it. On native this is a plain pass-through.
+ */
+function WebColumn({ children }: { children: React.ReactNode }) {
+  if (Platform.OS !== 'web') return <>{children}</>;
+  return (
+    <View style={shell.backdrop}>
+      <View style={shell.column}>{children}</View>
+    </View>
+  );
+}
+
+const shell = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: color.sunken, alignItems: 'center' },
+  column: {
+    flex: 1,
+    width: '100%',
+    maxWidth: WEB_COLUMN_MAX,
+    backgroundColor: color.canvas,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderColor: color.line,
+    overflow: 'hidden',
+  },
+});
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <StoreProvider>
-        <NavigationContainer theme={navTheme}>
-          <StatusBar style="dark" />
-          <Tab.Navigator
-            screenOptions={{
-              headerShown: false,
-              tabBarActiveTintColor: color.petrol,
-              tabBarInactiveTintColor: color.muted,
-              tabBarStyle: {
-                backgroundColor: color.card,
-                borderTopColor: color.lineSoft,
-                height: 62,
-                paddingTop: 6,
-              },
-              tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
-            }}
-          >
-            <Tab.Screen
-              name="Today"
-              component={TodayFlow}
-              options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={6} /> }}
-            />
-            <Tab.Screen
-              name="Pantry"
-              component={PantryFlow}
-              options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={4} /> }}
-            />
-            <Tab.Screen
-              name="Order"
-              component={OrderScreen}
-              options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={2} /> }}
-            />
-            <Tab.Screen
-              name="Setup"
-              component={SettingsScreen}
-              options={{
-                tabBarIcon: ({ focused }) => (
-                  <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={[type.label, { color: focused ? color.petrol : color.muted }]}>
-                      SET
-                    </Text>
-                  </View>
-                ),
+        <WebColumn>
+          <NavigationContainer theme={navTheme}>
+            <StatusBar style="dark" />
+            <Tab.Navigator
+              screenOptions={{
+                headerShown: false,
+                tabBarActiveTintColor: color.petrol,
+                tabBarInactiveTintColor: color.muted,
+                tabBarStyle: {
+                  backgroundColor: color.card,
+                  borderTopColor: color.lineSoft,
+                  height: 62,
+                  paddingTop: 6,
+                },
+                tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+                // The tab bar picks its label layout from the window width, not the column's,
+                // so on a wide browser it would switch to side-by-side labels. Keep the phone look.
+                ...(Platform.OS === 'web' ? { tabBarLabelPosition: 'below-icon' as const } : null),
               }}
-            />
-          </Tab.Navigator>
-        </NavigationContainer>
+            >
+              <Tab.Screen
+                name="Today"
+                component={TodayFlow}
+                options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={6} /> }}
+              />
+              <Tab.Screen
+                name="Pantry"
+                component={PantryFlow}
+                options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={4} /> }}
+              />
+              <Tab.Screen
+                name="Order"
+                component={OrderScreen}
+                options={{ tabBarIcon: ({ focused }) => <TabGlyph focused={focused} filled={2} /> }}
+              />
+              <Tab.Screen
+                name="Setup"
+                component={SettingsScreen}
+                options={{
+                  tabBarIcon: ({ focused }) => (
+                    <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={[type.label, { color: focused ? color.petrol : color.muted }]}>
+                        SET
+                      </Text>
+                    </View>
+                  ),
+                }}
+              />
+            </Tab.Navigator>
+          </NavigationContainer>
+        </WebColumn>
       </StoreProvider>
     </SafeAreaProvider>
   );

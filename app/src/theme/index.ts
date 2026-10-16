@@ -79,3 +79,18 @@ export const type = {
 /** Minimum tap target. Kitchen use, one hand, sometimes wet. */
 export const TOUCH_MIN = 48;
 export const TOUCH_PRIMARY = 56;
+
+/** The one floating action button per screen (Today, Pantry). */
+export const FAB_SIZE = 60;
+export const FAB_INSET = space.lg;
+/**
+ * Bottom padding for any scroll view that sits under the FAB, so the last row can always
+ * scroll fully clear of it: button height, its bottom inset, and one step of breathing room.
+ */
+export const FAB_CLEARANCE = FAB_SIZE + FAB_INSET + space.base;
+
+/**
+ * On a wide browser window the app renders as a centred phone-width column rather than
+ * stretching every card edge to edge. Web only; native layouts never see this.
+ */
+export const WEB_COLUMN_MAX = 600;
