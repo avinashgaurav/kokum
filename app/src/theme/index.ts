@@ -85,9 +85,10 @@ export const FAB_SIZE = 60;
 export const FAB_INSET = space.lg;
 /**
  * Bottom padding for any scroll view that sits under the FAB, so the last row can always
- * scroll fully clear of it: button height, its bottom inset, and one step of breathing room.
+ * scroll fully clear of it: button height, its bottom inset, and two steps of breathing room
+ * (116px, close to the 128px the old fixed spacer gave on native).
  */
-export const FAB_CLEARANCE = FAB_SIZE + FAB_INSET + space.base;
+export const FAB_CLEARANCE = FAB_SIZE + FAB_INSET + space.base * 2;
 
 /**
  * On a wide browser window the app renders as a centred phone-width column rather than
