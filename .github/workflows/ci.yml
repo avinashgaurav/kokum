@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
+  # The eval harness runs under Bun with shims in place of the model SDK.
+  # Only the steps that make no model call run here. app/ is not installed in
+  # this job on purpose, so the app's SDK import resolves to the shim.
+  evals-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
+      - name: Install eval shims
+        run: sh evals/harness/setup-shims.sh
+
+      - name: Engine expectations match the frozen rerank set
+        run: |
+          bun --no-install evals/harness/freeze-rerank.ts
+          git diff --exit-code evals/datasets/rerank.expected.json
+
+      - name: Rescoring the saved results reproduces them
+        run: |
+          for f in evals/results/2026-10-15-claude-cli.json evals/results/2026-10-15-claude-cli-after-fix.json; do
+            t="$(mktemp)"
+            cp "$f" "$t"
+            bun --no-install evals/harness/rescore.ts "$t" > /dev/null
+            diff <(jq -S . "$f") <(jq -S . "$t")
+          done
+
+      - name: Reattach holds against an adversarial model reply
+        run: |
+          bun --no-install evals/harness/run.ts adversarial > /dev/null
+          f="$(ls evals/results/*-adversarial.json)"
+          jq -e '.summary.cliCalls == 0' "$f"
+          jq -e '.reattachAdversarial | .inventedDropped and .duplicatesCollapsed and .omittedRestored and .overlongReasonReplaced and .cookNowFirstEnforced and (.omittedCookNowLandsAfterNeedItems | not)' "$f"
