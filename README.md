@@ -14,7 +14,7 @@ Recipe apps tell you to cook something and halfway through you find you are out 
 > | Grocery lists read fully correctly | 20 / 20 | **20 / 20** |
 > | Made-up recipe IDs reaching the user | 0 | **0** |
 > | Dish descriptions that name an ingredient the dish does not use | 3 / 80 | **0 / 80** |
-> | Cook-now dishes always shown first, even if the AI reorders them | No | **Yes, the code makes sure of it** |
+> | Cook-now dishes kept first, even if the AI reorders them | No | **Yes, enforced in code** |
 >
 > The tests used made-up data and ran through the Claude Code CLI, not the API path the live app uses. The new rule for dish sentences was written using the same 80 sentences it was then scored on. How it was tested, and every miss: [EVALS.md](EVALS.md).
 

@@ -89,7 +89,7 @@ Also reported:
    - r03 `veg-pulao`: "made with ghee ... with potato and cauliflower stirred through". The recipe uses oil and has no cauliflower.
    - r09 `kanda-poha`: "uses your onion and peas". The recipe has no peas.
 2. **Order is not enforced in code (a design gap, found by the offline stress test).** `reattach()` checks which dishes are there, but trusts the AI's order. If the AI puts a need-items dish first, the app shows it first. If the AI leaves out a cook-now dish, the app adds it at the very end, below need-items dishes. The live AI never did either in 10 pantries, so this cost no points above. It is still the only thing stopping a bad answer from ranking "go shopping" above "cook now".
-3. **Noise from the word-match check.** The rough word-match check flagged 8 sentences. 5 of those flagged something that was fine: pairing mentions such as "goes well with rice", and "aloo gobi" matching potato and cauliflower.
+3. **Noise from the word-match check.** The rough word-match check flagged 8 sentences. 5 of those were not real problems: pairing mentions such as "goes well with rice", and "aloo gobi" matching potato and cauliflower.
 
 ## Before and after the fix
 
@@ -111,7 +111,7 @@ Same 20 parse test cases, same 10 pantries, same scoring checklist, same AI mode
 | Pantries with cook-now dishes ranked first | 10 / 10 | 10 / 10 |
 | Sentences saying you have something not in the pantry (read by hand) | 0 / 80 | 0 / 80 |
 | **Sentences describing a dish with an ingredient it does not use (read by hand)** | **3 / 80** | **0 / 80** |
-| Word-match flags (each one checked by hand) | 8 (5 flagged something that was fine) | 6 (6 flagged something that was fine) |
+| Word-match flags (each one checked by hand) | 8 (5 not real problems) | 6 (6 not real problems) |
 | **Stress test: cook-now order enforced by code** | **No** | **Yes** |
 | Stress test: made-up id dropped, repeated id merged, missing dish put back, long reason replaced | 4 / 4 | 4 / 4 |
 
