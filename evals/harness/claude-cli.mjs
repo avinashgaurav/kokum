@@ -12,6 +12,8 @@ export const EVAL_CTX = new AsyncLocalStorage();
 export const CALL_LOG = [];
 // A call still running after this is killed and reported as an error.
 const TIMEOUT_MS = 300_000;
+// The CLI binary. Overridable so the offline test can point it at a missing binary.
+const claudeBin = () => process.env.EVAL_CLAUDE_BIN || 'claude';
 // Empty cwd so no project CLAUDE.md or git context is picked up.
 const CWD = mkdtempSync(join(tmpdir(), 'cli-eval-'));
 
@@ -66,15 +68,34 @@ export function callClaude({ model, system, messages, schema, label = '' }) {
   }
   const t0 = Date.now();
   return new Promise((resolve) => {
-    const p = spawn('claude', args, { cwd: CWD, env: { ...process.env, CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1' } });
+    const p = spawn(claudeBin(), args, { cwd: CWD, env: { ...process.env, CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1' } });
     let out = '';
     let err = '';
     let timedOut = false;
+    let settled = false;
     const timer = setTimeout(() => { timedOut = true; p.kill('SIGKILL'); }, TIMEOUT_MS);
     p.stdout.on('data', (d) => (out += d));
     p.stderr.on('data', (d) => (err += d));
+    // A missing binary also fails the stdin write; the 'error' handler below reports it.
+    p.stdin.on('error', () => {});
     p.stdin.end(stdin);
+    // Without this, a spawn failure (for example no `claude` on PATH) waits out the full timeout.
+    p.on('error', (e) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      const ms = Date.now() - t0;
+      const rec = {
+        label, ms, exit: null, is_error: true,
+        result_head: `could not run the claude CLI: ${e.message}`.slice(0, 300),
+        models: [], usage: null, cost_usd_list: null, num_turns: undefined,
+      };
+      CALL_LOG.push(rec);
+      resolve({ ok: false, structured: null, text: '', envelope: null, ms, rec, limitHit: false });
+    });
     p.on('close', (code) => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
       const ms = Date.now() - t0;
       let env = null;
