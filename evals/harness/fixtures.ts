@@ -9,8 +9,26 @@ export const NOW = Date.parse('2026-10-15T18:00:00Z');
 const DAY = 86_400_000;
 export const DS = resolve(import.meta.dir, '..', 'datasets');
 
+/**
+ * Which test set to run. 'tuned' is the first set (parse.json, rerank.json), which the
+ * app's fixes were written against. 'new' (EVAL_SET=new) is new-cases.json, never used
+ * for tuning; its answer key lives in the same file.
+ */
+export const SET: 'tuned' | 'new' = process.env.EVAL_SET === 'new' ? 'new' : 'tuned';
+export const NEW_FILE = resolve(DS, 'new-cases.json');
+const readJson = (f: string) => JSON.parse(readFileSync(f, 'utf8'));
+
 export function loadRerank() {
-  return JSON.parse(readFileSync(resolve(DS, 'rerank.json'), 'utf8'));
+  return SET === 'new' ? readJson(NEW_FILE).rerank : readJson(resolve(DS, 'rerank.json'));
+}
+
+export function loadParse(): { items: any[] } {
+  return SET === 'new' ? readJson(NEW_FILE).parse : readJson(resolve(DS, 'parse.json'));
+}
+
+/** Engine expectations frozen before any model call. */
+export function loadFrozen(): any[] {
+  return SET === 'new' ? readJson(NEW_FILE).answerKey.rerank : readJson(resolve(DS, 'rerank.expected.json'));
 }
 
 export function buildState(ds: any, st: any): { household: Household; pantry: Map<string, PantryItem>; suggestions: Suggestion[] } {

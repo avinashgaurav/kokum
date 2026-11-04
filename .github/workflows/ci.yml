@@ -57,6 +57,8 @@ jobs:
         run: |
           bun --no-install evals/harness/freeze-rerank.ts
           git diff --exit-code evals/datasets/rerank.expected.json
+          EVAL_SET=new bun --no-install evals/harness/freeze-rerank.ts
+          git diff --exit-code evals/datasets/new-cases.json
 
       - name: Rescoring the saved results reproduces them
         run: |

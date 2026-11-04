@@ -8,7 +8,7 @@ import { rerank } from '../../app/src/ai/rerank';
 import { MODEL } from '../../app/src/ai/client';
 import { INGREDIENT_INDEX } from '../../app/src/data/ingredients';
 import { CALL_LOG, EVAL_CTX } from './claude-cli.mjs';
-import { DS, buildState, loadRerank } from './fixtures';
+import { DS, SET, buildState, loadFrozen, loadParse, loadRerank } from './fixtures';
 import { sentenceIssues } from './sentences';
 
 const which = process.argv[2] ?? 'all';
@@ -26,7 +26,7 @@ async function pool<T, R>(items: T[], fn: (t: T) => Promise<R>): Promise<R[]> {
 const close = (a: number, b: number) => Math.abs(a - b) <= Math.max(0.01 * Math.abs(b), 1e-9);
 
 async function runParse() {
-  const ds = JSON.parse(readFileSync(resolve(DS, 'parse.json'), 'utf8'));
+  const ds = loadParse();
   return pool(ds.items, async (it: any) => {
     const t0 = Date.now();
     const res = it.image
@@ -67,7 +67,7 @@ async function runParse() {
 
 async function runRerank() {
   const ds = loadRerank();
-  const frozen = JSON.parse(readFileSync(resolve(DS, 'rerank.expected.json'), 'utf8'));
+  const frozen = loadFrozen();
   return pool(ds.states, async (st: any) => {
     const { household, pantry, suggestions } = buildState(ds, st);
     const exp = frozen.find((f: any) => f.id === st.id);
@@ -162,12 +162,13 @@ const adversarial = which === 'parse' ? null : await reattachAdversarial();
 const lat = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); return { n: s.length, p50: s[Math.floor(s.length / 2)], p90: s[Math.floor(s.length * 0.9)] ?? s[s.length - 1], max: s[s.length - 1] }; };
 const sumUsage = CALL_LOG.reduce((a: any, c: any) => { if (c.usage) { a.input += c.usage.input_tokens + (c.usage.cache_read_input_tokens ?? 0) + (c.usage.cache_creation_input_tokens ?? 0); a.output += c.usage.output_tokens; } return a; }, { input: 0, output: 0 });
 
-const summary: any = { started, wallMs, configuredModel: MODEL, modelsAnswered: [...new Set(CALL_LOG.flatMap((c: any) => c.models))], cliCalls: CALL_LOG.length, cliErrors: CALL_LOG.filter((c: any) => c.is_error).length, usageTotals: sumUsage, callLatencyMs: lat(CALL_LOG.map((c: any) => c.ms)) };
+const costUsd = CALL_LOG.reduce((a: number, c: any) => a + (c.cost_usd_list ?? 0), 0);
+const summary: any = { set: SET, started, wallMs, costUsdCliReported: Math.round(costUsd * 10000) / 10000, configuredModel: MODEL, modelsAnswered: [...new Set(CALL_LOG.flatMap((c: any) => c.models))], cliCalls: CALL_LOG.length, cliErrors: CALL_LOG.filter((c: any) => c.is_error).length, usageTotals: sumUsage, callLatencyMs: lat(CALL_LOG.map((c: any) => c.ms)) };
 if (parse) {
   const allExpected = parse.reduce((a, p: any) => a, 0);
   const missCats: Record<string, number> = {};
   for (const p of parse as any[]) for (const m of p.misses) missCats[m.category] = (missCats[m.category] ?? 0) + 1;
-  const ds = JSON.parse(readFileSync(resolve(DS, 'parse.json'), 'utf8'));
+  const ds = loadParse();
   const totalLines = ds.items.reduce((a: number, i: any) => a + i.expect.length, 0);
   const missedLines = (parse as any[]).reduce((a, p) => a + p.misses.filter((m: any) => m.category === 'missed-item' || m.category === 'call-failed').length, 0);
   const qtyWrong = (parse as any[]).reduce((a, p) => a + p.misses.filter((m: any) => m.category === 'wrong-quantity').length, 0);
@@ -192,7 +193,7 @@ if (rr) {
   };
 }
 const date = started.slice(0, 10);
-const file = resolve(import.meta.dir, '..', 'results', `${date}-claude-cli${which === 'all' ? '' : '-' + which}${process.env.EVAL_TAG ? '-' + process.env.EVAL_TAG : ''}.json`);
+const file = resolve(import.meta.dir, '..', 'results', `${date}-claude-cli${SET === 'new' ? '-new-cases' : ''}${which === 'all' ? '' : '-' + which}${process.env.EVAL_TAG ? '-' + process.env.EVAL_TAG : ''}.json`);
 writeFileSync(file, JSON.stringify({ method: 'Claude Code CLI (claude -p) with the app\'s own prompts, schema and post-processing; not the production API path', summary, parse, rerank: rr, reattachAdversarial: adversarial, calls: CALL_LOG }, null, 2));
 console.log(JSON.stringify({ ...summary, reattachAdversarial: adversarial }, null, 2));
 console.log('wrote', file);
