@@ -68,6 +68,12 @@ jobs:
             bun --no-install evals/harness/rescore.ts "$t" > /dev/null
             diff <(jq -S . "$f") <(jq -S . "$t")
           done
+          for f in evals/results/2026-11-04-claude-cli-new-cases-run1.json evals/results/2026-11-04-claude-cli-new-cases-run2.json evals/results/2026-11-04-claude-cli-new-cases-run3.json; do
+            t="$(mktemp)"
+            cp "$f" "$t"
+            EVAL_SET=new bun --no-install evals/harness/rescore.ts "$t" > /dev/null
+            diff <(jq -S . "$f") <(jq -S . "$t")
+          done
 
       - name: Reattach holds against an adversarial model reply
         run: |
