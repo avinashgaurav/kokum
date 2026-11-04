@@ -1,0 +1,1087 @@
+{
+  "source": "2026-11-04-claude-cli-new-cases-run1.json",
+  "summary": {
+    "reviewerInstructions": "v2",
+    "reviewer": "AI reviewer (claude-opus-5-5), not a person",
+    "sentences": 80,
+    "claimsItemTheyLack": 0,
+    "contradictsStateOrMissing": 1,
+    "namesIngredientNotInDish": 0,
+    "calls": 10,
+    "costUsdCliReported": 0.3505
+  },
+  "verdicts": [
+    {
+      "pantry": "n-r01",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "A comforting, low-effort pot for four in 25 minutes, using your toor dal, tomato and ghee, with onion and dhaniya to finish.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "egg-bhurji",
+      "state": "cook-now",
+      "sentence": "Ready in 12 minutes from eggs and onion you already have, with tomato, green chilli and dhaniya to make it brighter.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Rice, jeera and ghee are all on hand, and it sits nicely on the second burner next to a dal or bhurji in 20 minutes.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Dal and bhurji are named as dishes to serve alongside, not as ingredients of this dish."
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "A one-pot rice for everyday cooking that you can make right now with your rice, onion and garam masala.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "A quick, light 15-minute option once you pick up besan.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "A light 15-minute dish that only needs poha.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "An easy everyday sabzi that only needs bhindi.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "A wholesome sabzi for another night, since you'd need potato and cauliflower.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "kanda-poha",
+      "state": "cook-now",
+      "sentence": "Ready in 15 minutes from what you already have, and you can finish it with your curry leaves and a squeeze of lemon for the hungry kids.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "besan-chilla",
+      "state": "cook-now",
+      "sentence": "Another 15-minute option you can make right now, and you can add your onion to the batter if you like.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Just inside your 20-minute limit and needs only rice, jeera, ghee and salt, all of which you have.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You can make it with what you have, but at 30 minutes it goes over your 20-minute limit.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "The quickest dish here at 12 minutes, but you would need to buy eggs.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "Takes 25 minutes and needs tomato.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "Takes 25 minutes and needs bhindi.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "kadhi",
+      "state": "need-items",
+      "sentence": "The slowest here at 35 minutes, and it needs curd.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "You can make this comfort dish right now with your toor dal, tomato and ghee, and it takes 25 easy minutes.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "It takes 20 minutes with rice, jeera and ghee you already have, and it goes well with dal on your second burner.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Dal is a pairing on another burner, not an ingredient of jeera rice; fine."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You can cook this now with your rice, onion and garam masala, and it's a filling one-pot meal for four in half an hour.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "palak-paneer",
+      "state": "need-items",
+      "sentence": "It's the closest you can get to the paneer you're craving, and all you need to buy is paneer, since you already have the palak, onion, tomato and garlic.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Paneer is correctly named as the item to buy; palak, onion, tomato and garlic are all in the pantry."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "This 12-minute dish is the fastest here, and all you need to buy is eggs.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "It's quick and light at 15 minutes, and all you need to buy is besan.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "This light 15-minute dish uses your onion, rai and haldi, and all you need to buy is poha.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "It's an easy everyday sabzi, and all you need to buy is bhindi.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "Simple toor dal with a light jeera and ghee tadka is easy on an upset stomach, and everything for it is in your kitchen for a 25-minute meal.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Plain rice with just jeera, ghee and salt is gentle on the stomach, takes 20 minutes and goes well with dal on your second burner.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Dal is mentioned as a pairing, not as an ingredient of the dish."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "kadhi",
+      "state": "cook-now",
+      "sentence": "Curd and besan make a soothing, light curry, and you have curry leaves for the tadka, though at 35 minutes it is the slowest of tonight's options.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "besan-chilla",
+      "state": "cook-now",
+      "sentence": "A low-effort, light meal ready in 15 minutes from besan and haldi, and you can add tomato if you like.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "Light and quick, but you would need to buy poha and onion.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "Ready in 12 minutes, but you would need to buy eggs and onion.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "veg-pulao",
+      "state": "need-items",
+      "sentence": "A one-pot rice dish, but you would need to buy onion.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "Filling rather than light, and you would need to buy potato and cauliflower.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "Everything is already in your kitchen, and in 30 minutes your potatoes, peas, capsicum and onion become a filling one-pot meal for four with no shop run.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "You can make this right now with rice, jeera and ghee in just 20 minutes, and it is about as easy as dinner gets.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "This needs a shop run for tomato.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "This needs a shop run for eggs.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "This needs a shop run for cauliflower.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "This needs a shop run for besan.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "This needs a shop run for poha.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "This needs a shop run for bhindi.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "This is the chawal half of tonight's plan, and you can make it now from what you have in about 20 minutes.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Chawal' just means rice, which is a core ingredient."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "If you can't get rajma tonight, this is the closest comfort swap, and you can make it now with your toor dal, tomato and ghee in about 25 minutes.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Rajma is only named as the dish being replaced, not as an ingredient."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "This rice dish with onion and garam masala is a good fallback if you'd rather have a single pot, and it's ready in about 30 minutes.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "bhindi-masala",
+      "state": "cook-now",
+      "sentence": "This puts your bhindi to good use as an everyday side, and you can make it now in about 25 minutes.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "rajma-masala",
+      "state": "need-items",
+      "sentence": "This is the comfort dish you asked for, but you need to buy Rajma first and it takes about 50 minutes.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "You need Egg.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "You need Besan.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "You need Poha.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Ghee and jeera rice is ready in 20 minutes with what you have, and it needs only one burner, leaving the other free for a curry.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "'a curry' is a separate dish cooked on the other burner, not an ingredient of the rice."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "Pulao with green peas and garam masala feels more special than plain rice, and you can make it in 30 minutes with no shopping.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Green peas are optional and in the pantry; 'plain rice' is only a comparison."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "matar-paneer",
+      "state": "check-first",
+      "sentence": "This is the one meant for impressing guests, and kasuri methi finishes it nicely, but first check that your paneer, tomato and ginger are still good.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Kasuri methi is optional and in the pantry."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "dal-tadka",
+      "state": "check-first",
+      "sentence": "A ghee and jeera tadka on toor dal rounds out a guest meal in 25 minutes, once you check your tomatoes are still usable.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "palak-paneer",
+      "state": "need-items",
+      "sentence": "It is a good dish for guests, but you would need to buy palak and garlic, and check that your paneer and tomato are still good.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "It is quick at 12 minutes but more of an everyday dish, and you would need to buy eggs.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "It is light and fast but suits breakfast more than guests, and you would need to buy besan.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "It is a 15-minute breakfast-style dish rather than a dinner for guests, and you would need to buy poha.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "aloo-gobi",
+      "state": "cook-now",
+      "sentence": "You have not made this before.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "A filling one-pot rice for four that you can cook right now with onion, garam masala and some potato added in, ready in about 30 minutes.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Potato is an optional ingredient and is on the pantry list, so this is fine."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "The easiest option at 20 minutes, using only rice, jeera and ghee, and it goes well next to the aloo gobi on your second burner.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Aloo gobi is named as a side pairing, not as an ingredient, so this is fine."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "Done in 12 minutes, and eggs are your best stand-in for meat tonight, but this was marked as needing Egg even though Egg is on your pantry list, so check before you start.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": true,
+      "namesIngredientNotInDish": false,
+      "note": "Suggests Egg isn't really missing because it's on the pantry list, which questions the app's state. Egg can be listed and still be short. 'Stand-in for meat' is a comparison, not an ingredient claim."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "Comforting dal in 25 minutes with toor dal, jeera and ghee, but you need to buy Tomato.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "Quick and light at 15 minutes, but you need to buy Besan.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "A light 15-minute dish with onion and rai, but you need to buy Poha.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "A simple everyday sabzi in 25 minutes, but you need to buy Bhindi.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "Ready in 15 minutes and light on effort, it only needs besan and haldi.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "The fastest option at 12 minutes, it needs egg and onion.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Onion is on the pantry list but still missing because there isn't enough; saying it's needed fits the missing list."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "jeera-rice",
+      "state": "need-items",
+      "sentence": "A simple 20-minute everyday dish that needs rice, jeera and ghee.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "A 25-minute everyday sabzi that needs bhindi, onion and haldi.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "Wholesome and filling for four, it needs potato, cauliflower and haldi.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "veg-pulao",
+      "state": "need-items",
+      "sentence": "A one-pot meal in about 30 minutes that needs rice, onion and garam masala.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "Quick and light at 15 minutes, it needs poha, onion, rai and haldi.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "Comforting and low effort, but it needs toor dal, tomato, haldi, jeera and ghee.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Ready to cook now in 20 minutes and goes well with any of the vegetable dishes above, though it uses no vegetables itself.",
+      "index": 0,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Vegetable dishes are mentioned only as a pairing, not as ingredients."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "palak-paneer",
+      "state": "check-first",
+      "sentence": "Uses the most of your older produce in one pot, palak, tomato and onion, so check that the palak, paneer, onion and tomato are still good before you start.",
+      "index": 1,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "bhindi-masala",
+      "state": "check-first",
+      "sentence": "Bhindi goes soft fast, so this is a good way to use it in 25 minutes if the bhindi and onion still look fresh.",
+      "index": 2,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "dal-tadka",
+      "state": "check-first",
+      "sentence": "An easy 25-minute dal that uses up tomato, with optional onion and garlic, once you've checked the tomato is still usable.",
+      "index": 3,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": "Onion and garlic are optional for this dish and both are in the pantry."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "veg-pulao",
+      "state": "check-first",
+      "sentence": "A 30-minute rice dish that uses up onion, so check the onion first.",
+      "index": 4,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "Needs eggs.",
+      "index": 5,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "matar-paneer",
+      "state": "need-items",
+      "sentence": "Needs green peas and ginger.",
+      "index": 6,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "Needs potato and cauliflower.",
+      "index": 7,
+      "claimsItemTheyLack": false,
+      "contradictsStateOrMissing": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    }
+  ],
+  "calls": [
+    {
+      "label": "review-n-r02",
+      "ms": 6432,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":2,\"claimsItemTheyLack\":false,\"contradictsState",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 597,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 3416,
+        "thinking_tokens": 101
+      },
+      "cost_usd_list": 0.039276,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r01",
+      "ms": 6819,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":2,\"claimsItemTheyLack\":false,\"contradictsState",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 668,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 3476,
+        "thinking_tokens": 140
+      },
+      "cost_usd_list": 0.041176,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r03",
+      "ms": 7309,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"Dal is a pairing on another burner, not an ingredient of j",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 682,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 3515,
+        "thinking_tokens": 120
+      },
+      "cost_usd_list": 0.041768,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r05",
+      "ms": 7028,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":2,\"claimsItemTheyLack\":false,\"contradictsState",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 559,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2145,
+        "thinking_tokens": 63
+      },
+      "cost_usd_list": 0.028597400000000002,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r04",
+      "ms": 7436,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"Dal is mentioned as a pairing, not as an ingredient of the",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 644,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2249,
+        "thinking_tokens": 122
+      },
+      "cost_usd_list": 0.0311294,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r06",
+      "ms": 6668,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"'Chawal' just means rice, which is a core ingredient.\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"Rajma",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 641,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2174,
+        "thinking_tokens": 101
+      },
+      "cost_usd_list": 0.0304694,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r09",
+      "ms": 7624,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"Onion is on the pantry list but still missing because ther",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 609,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2253,
+        "thinking_tokens": 78
+      },
+      "cost_usd_list": 0.0304614,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r07",
+      "ms": 8574,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"'a curry' is a separate dish cooked on the other burner, not an ingredient of the rice.\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngred",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 801,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2331,
+        "thinking_tokens": 229
+      },
+      "cost_usd_list": 0.0349254,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r08",
+      "ms": 9943,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"Potato is an optional ingredient and is on the pantry list",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 968,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2238,
+        "thinking_tokens": 204
+      },
+      "cost_usd_list": 0.037521399999999996,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r10",
+      "ms": 8347,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"Vegetable dishes are mentioned only as a pairing, not as ingredients.\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":fal",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 847,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2253,
+        "thinking_tokens": 149
+      },
+      "cost_usd_list": 0.0352214,
+      "num_turns": 2
+    }
+  ]
+}
