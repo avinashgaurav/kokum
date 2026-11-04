@@ -1,0 +1,37 @@
+{
+  "note": "Positive control for the AI sentence reviewer (review-sentences.ts, instructions v2). Made-up sentences written by hand, 10 known-bad and 10 known-good, mixed in two pantries in the same shape the reviewer sees in a real run. Written and committed before the reviewer saw any of them. 'expect' is the answer key: 'bad' items list the field the reviewer must set to true to count as caught ('catch'), plus any other field that is also a fair answer ('alsoOk'); 'good' items must have every field false. Dish states and missing lists are written by hand to match each pantry.",
+  "groups": [
+    {
+      "id": "ctl-a",
+      "pantry": ["Atta", "Rice", "Toor dal", "Cooking oil", "Ghee", "Salt", "Haldi", "Jeera", "Rai", "Garam masala", "Lal mirch", "Onion", "Tomato", "Palak", "Garlic", "Ginger"],
+      "sentences": [
+        {"recipeId": "dal-tadka", "state": "cook-now", "missing": [], "sentence": "An easy 25-minute dal with your toor dal and tomato and a ghee-jeera tadka.", "expect": "good"},
+        {"recipeId": "palak-paneer", "state": "need-items", "missing": ["Paneer"], "sentence": "You already have the paneer and palak, so this is a rich 30-minute dinner.", "expect": "bad", "catch": "claimsItemTheyLack", "alsoOk": ["contradictsStateOrMissing"]},
+        {"recipeId": "jeera-rice", "state": "cook-now", "missing": [], "sentence": "Rice cooked in ghee with jeera and sliced onion, ready in 20 minutes.", "expect": "bad", "catch": "namesIngredientNotInDish", "alsoOk": []},
+        {"recipeId": "egg-bhurji", "state": "need-items", "missing": ["Egg"], "sentence": "The fastest dish at 12 minutes, once you buy eggs.", "expect": "good"},
+        {"recipeId": "dal-tadka", "state": "cook-now", "missing": [], "sentence": "A 25-minute dal with toor dal, tomato and a handful of your palak stirred in.", "expect": "bad", "catch": "namesIngredientNotInDish", "alsoOk": []},
+        {"recipeId": "jeera-rice", "state": "cook-now", "missing": [], "sentence": "Ready in 20 minutes with just rice, jeera and ghee, and it goes well with the dal.", "expect": "good"},
+        {"recipeId": "matar-paneer", "state": "need-items", "missing": ["Paneer", "Green peas"], "sentence": "Uses the frozen peas you have, and you just need paneer.", "expect": "bad", "catch": "claimsItemTheyLack", "alsoOk": ["contradictsStateOrMissing"]},
+        {"recipeId": "palak-paneer", "state": "need-items", "missing": ["Paneer"], "sentence": "Your palak needs using up, and you only need to buy paneer.", "expect": "good"},
+        {"recipeId": "egg-bhurji", "state": "need-items", "missing": ["Egg"], "sentence": "It says you need eggs, but you probably have some, so go ahead and start.", "expect": "bad", "catch": "contradictsStateOrMissing", "alsoOk": ["claimsItemTheyLack"]},
+        {"recipeId": "veg-pulao", "state": "cook-now", "missing": [], "sentence": "A one-pot rice with onion and garam masala that you can make now in 30 minutes.", "expect": "good"},
+        {"recipeId": "veg-pulao", "state": "cook-now", "missing": [], "sentence": "A one-pot pulao with rice, onion and tomato, ready in 30 minutes.", "expect": "bad", "catch": "namesIngredientNotInDish", "alsoOk": []},
+        {"recipeId": "kanda-poha", "state": "need-items", "missing": ["Poha"], "sentence": "A light 15-minute dish with your onion, once you buy poha.", "expect": "good"}
+      ]
+    },
+    {
+      "id": "ctl-b",
+      "pantry": ["Rice", "Cooking oil", "Salt", "Haldi", "Jeera", "Ghee", "Rai", "Egg", "Onion", "Cauliflower", "Potato", "Curd", "Besan"],
+      "sentences": [
+        {"recipeId": "aloo-gobi", "state": "cook-now", "missing": [], "sentence": "Uses your cauliflower before it turns, with potato and haldi, in 30 minutes.", "expect": "good"},
+        {"recipeId": "egg-bhurji", "state": "need-items", "missing": ["Egg"], "sentence": "Egg is listed as missing, but your pantry shows eggs, so you can probably make it now.", "expect": "bad", "catch": "contradictsStateOrMissing", "alsoOk": []},
+        {"recipeId": "kadhi", "state": "cook-now", "missing": [], "sentence": "Light and soothing, with your curd and besan and a rai tadka, in 35 minutes.", "expect": "good"},
+        {"recipeId": "dal-tadka", "state": "need-items", "missing": ["Toor dal", "Tomato"], "sentence": "Use your tomatoes and buy toor dal for a comforting 25-minute dal.", "expect": "bad", "catch": "claimsItemTheyLack", "alsoOk": ["contradictsStateOrMissing"]},
+        {"recipeId": "egg-bhurji", "state": "need-items", "missing": ["Egg"], "sentence": "Quick at 12 minutes, but you need more eggs first.", "expect": "good"},
+        {"recipeId": "kadhi", "state": "cook-now", "missing": [], "sentence": "A light kadhi with curd, besan and a little potato for body, ready in 35 minutes.", "expect": "bad", "catch": "namesIngredientNotInDish", "alsoOk": []},
+        {"recipeId": "dal-tadka", "state": "need-items", "missing": ["Toor dal", "Tomato"], "sentence": "A comforting dal, once you buy toor dal and tomato.", "expect": "good"},
+        {"recipeId": "besan-chilla", "state": "cook-now", "missing": [], "sentence": "Besan pancakes with grated cauliflower and onion, ready in 15 minutes.", "expect": "bad", "catch": "namesIngredientNotInDish", "alsoOk": []}
+      ]
+    }
+  ]
+}
