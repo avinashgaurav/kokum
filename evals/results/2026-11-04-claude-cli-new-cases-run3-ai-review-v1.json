@@ -1,0 +1,1005 @@
+{
+  "source": "2026-11-04-claude-cli-new-cases-run3.json",
+  "summary": {
+    "reviewer": "AI reviewer (claude-opus-5-5), not a person",
+    "sentences": 80,
+    "saysTheyHaveSomethingTheyLack": 23,
+    "namesIngredientNotInDish": 0,
+    "calls": 10,
+    "costUsdCliReported": 0.443
+  },
+  "verdicts": [
+    {
+      "pantry": "n-r01",
+      "recipeId": "egg-bhurji",
+      "state": "cook-now",
+      "sentence": "Ready in about 12 minutes with your eggs and onion, and you can add tomato, green chilli, haldi and dhaniya too.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "A low-effort, comforting 25-minute pot of toor dal and tomato finished in ghee and jeera, with onion and dhaniya if you like.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "The recipe uses garlic, which isn't in the pantry, but the sentence doesn't mention it or say they have it."
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Twenty easy minutes of rice tempered with ghee and jeera, and it goes well next to a dal.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Goes well next to a dal' suggests a side dish. It doesn't say dal is an ingredient."
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "A one-pot 30-minute rice dish with onion and garam masala that you can make with what you have.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Make with what you have' implies they have green peas, potato and capsicum, which aren't in the pantry. The cook-now state and empty missing list look wrong."
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "A light 15-minute option once you pick up besan.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "Quick and light in 15 minutes, but you need poha.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Kanda' is part of the dish name, not an ingredient claim. Curry leaves and lemon aren't in the pantry either, but the sentence doesn't say they have them."
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "An everyday 25-minute sabzi that only needs bhindi.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r01",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "A wholesome 30-minute sabzi for another night, since you need potato and cauliflower.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "kanda-poha",
+      "state": "cook-now",
+      "sentence": "You can have this on the table in 15 minutes with what's already in the kitchen, and your curry leaves and lemon brighten it up.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'With what's already in the kitchen' implies they have everything, but the recipe needs green chilli, which is not in the pantry."
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "besan-chilla",
+      "state": "cook-now",
+      "sentence": "This takes 15 minutes from pantry staples, and you can stir in your onion to make it more filling for hungry kids.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'From pantry staples' implies they have everything, but tomato and green chilli are not in the pantry. Onion is in the recipe and the pantry."
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Everything is in the house and it's done in 20 minutes, just inside your limit, with only rice, jeera and ghee.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You have everything for this, but at 30 minutes it runs past the 20 you asked for.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'You have everything' is wrong: green peas, potato and capsicum are not in the pantry."
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "At 12 minutes this is the fastest option, but you would need to buy eggs first.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "This is a comforting 25-minute dinner, but you need tomato for it.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Garlic and dhaniya are also not in the pantry, but the sentence does not say they have them."
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "This takes 25 minutes and you need bhindi for it.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Tomato is also not in the pantry, but the sentence does not say they have it."
+    },
+    {
+      "pantry": "n-r02",
+      "recipeId": "kadhi",
+      "state": "need-items",
+      "sentence": "At 35 minutes this is the slowest option, and you need curd for it.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "If you'd rather not shop, this is a comforting 25-minute dish, and you already have everything for it, including toor dal, tomato and ghee.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'You already have everything' implies they have Dhaniya, which is in the recipe but not in the pantry."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "It takes 20 minutes with rice, jeera and ghee you already have, and it goes well alongside a dal.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Goes well alongside a dal' is a pairing, not an ingredient claim."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You have the rice, onion and garam masala, so it's an easy 30-minute one-pot meal for four.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "Saying it's an easy meal they can make now implies they have Green peas, Potato and Capsicum, which are not in the pantry."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "palak-paneer",
+      "state": "need-items",
+      "sentence": "This is the closest you can get to the paneer you're craving, and you only need to buy paneer.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Paneer is correctly named as something to buy. The sentence also implies they have Green chilli, which is in the recipe but not in the pantry and not in the missing list. That is a data mismatch, not a false claim of having it."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "It's ready in 12 minutes, and you only need to buy eggs.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only need to buy eggs' implies they have Green chilli and Dhaniya, which are not in the pantry."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "It's light and done in 15 minutes, and you only need to buy besan.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only need to buy besan' implies they have Green chilli, which is not in the pantry."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "It's a quick 15-minute dish, and you only need to buy poha.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only need to buy poha' implies they have Green chilli, Curry leaves and Lemon, which are not in the pantry."
+    },
+    {
+      "pantry": "n-r03",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "This is a good everyday sabzi, and you only need to buy bhindi.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "Gentle on an upset stomach, toor dal with haldi and jeera is ready in 25 minutes, and you have everything for it.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "\"You have everything for it\" is wrong: the recipe also needs onion, garlic and dhaniya, which aren't in the pantry."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Plain rice with a little jeera and ghee is easy to digest, takes 20 minutes and can cook on your second burner next to the dal.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "\"Next to the dal\" refers to another dish cooking alongside, not an ingredient of jeera rice."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "kadhi",
+      "state": "cook-now",
+      "sentence": "Curd and besan make a soothing, light meal, and your curry leaves can go into the tadka, though it takes the longest at 35 minutes.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "besan-chilla",
+      "state": "cook-now",
+      "sentence": "A light option ready in 15 minutes from besan and haldi, and you can add your tomato if you like.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Recipe also needs onion and green chilli, which aren't in the pantry, but the sentence doesn't say they have them."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "veg-pulao",
+      "state": "need-items",
+      "sentence": "You'd need to buy onion, and it's heavier than you want tonight.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing list leaves out green peas, potato and capsicum, which aren't in the pantry; the sentence only mentions buying onion."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "Light, but you'd need to buy poha and onion.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing list leaves out green chilli and lemon, which aren't in the pantry; the sentence doesn't say they have them."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "You'd need to buy egg and onion.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing list leaves out green chilli and dhaniya, which aren't in the pantry; the sentence doesn't say they have them."
+    },
+    {
+      "pantry": "n-r04",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "You'd need to buy potato and cauliflower.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing list leaves out onion and dhaniya, which aren't in the pantry; the sentence doesn't say they have them."
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You don't need to shop for this one, and your potato, capsicum and green peas turn it into a filling one-pot meal for four in about 30 minutes.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Everything for this is already in your kitchen, and it takes just 20 minutes with only rice, jeera, ghee and salt.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "This is comforting and takes 25 minutes, but you'd need to buy tomato.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Garlic and dhaniya are also not in the pantry, but the sentence doesn't say the household has them."
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "This would use up your potatoes, but you'd need to buy cauliflower.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Potato is in the pantry. Dhaniya is not, but the sentence doesn't claim it."
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "This is the fastest dish here at 12 minutes, but you'd need to buy eggs.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Tomato, green chilli and dhaniya are not in the pantry, but the sentence doesn't claim them."
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "This is a light 15-minute option, but you'd need to buy besan.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Tomato and green chilli are not in the pantry, but the sentence doesn't claim them."
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "This is a light 15-minute dish, but you'd need to buy poha.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Green chilli, curry leaves and lemon are not in the pantry, but the sentence doesn't claim them."
+    },
+    {
+      "pantry": "n-r05",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "This is an easy everyday sabzi, but you'd need to buy bhindi.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Tomato is not in the pantry, but the sentence doesn't claim it."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "This is the chawal half of tonight, ready in 20 minutes with the rice, jeera and ghee you already have.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "dal-tadka",
+      "state": "cook-now",
+      "sentence": "If you can't get rajma, this is the closest comfort swap to go with rice, with toor dal, tomato and a ghee-jeera tadka in 25 easy minutes.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Rajma is mentioned only as the dish this replaces, and 'go with rice' is a pairing. Neither is an ingredient claim. Dhaniya is in the recipe but not the pantry; the sentence doesn't claim they have it."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "A one-pot rice dish you can cook right now in half an hour with onion and garam masala.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Cook right now' implies they have everything, but green peas, potato and capsicum are not in the pantry."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "bhindi-masala",
+      "state": "cook-now",
+      "sentence": "Your bhindi is sitting in the kitchen, and 25 minutes with onion, haldi and a little tomato makes it a good side for any of these.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Side for any of these' is a pairing, not an ingredient claim."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "rajma-masala",
+      "state": "need-items",
+      "sentence": "This is the comfort dish you asked for, and you only need to buy Rajma.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Rajma is correctly named as something to buy; everything else is in the pantry."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "It's done in 12 minutes, and you only need to buy Egg.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only need to buy Egg' implies they have green chilli and dhaniya, which are not in the pantry."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "A light 15-minute option, and you only need to buy Besan.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only need to buy Besan' implies they have green chilli, which is not in the pantry."
+    },
+    {
+      "pantry": "n-r06",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "Quick and light at 15 minutes, and you only need to buy Poha.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only need to buy Poha' implies they have green chilli, curry leaves and lemon, which are not in the pantry."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You can cook this right now, and it makes a fragrant, festive rice with green peas and garam masala to serve alongside a curry for four.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'You can cook this right now' implies they have Potato and Capsicum, which the recipe needs but the pantry lacks. 'Alongside a curry' is a pairing, not an ingredient."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "You can cook this right now in 20 minutes with ghee and jeera, and it's a simple, elegant base to serve with a richer main.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Serve with a richer main' is a pairing, not an ingredient."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "matar-paneer",
+      "state": "check-first",
+      "sentence": "This is the one most likely to impress your in-laws, a rich paneer and peas curry finished with kasuri methi, so just check your paneer, tomato and ginger are still good before you start.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "dal-tadka",
+      "state": "check-first",
+      "sentence": "A ghee and jeera tadka on toor dal makes a comforting dish to round out a guest meal in 25 minutes, so just check your tomatoes are still fresh first.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "Saying they only need to check the tomatoes implies they have Garlic and Dhaniya, which the recipe needs but the pantry lacks."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "palak-paneer",
+      "state": "need-items",
+      "sentence": "You'd need to pick up palak and garlic first.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing items are named as things to buy, which is fine."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "You'd need to pick up besan first.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing item is named as something to buy, which is fine."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "You'd need to pick up eggs first.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing item is named as something to buy, which is fine."
+    },
+    {
+      "pantry": "n-r07",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "You'd need to pick up poha first.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Missing item is named as something to buy, which is fine. Green chilli, curry leaves and lemon aren't in the pantry either, but the sentence doesn't claim they have them."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "aloo-gobi",
+      "state": "cook-now",
+      "sentence": "There's no chicken or fish in the kitchen, so this is the closest you'll get to a curry tonight: potato and cauliflower with haldi, onion and lal mirch, ready in 30 minutes for all four of you.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Chicken and fish are only mentioned as not being in the kitchen. Every ingredient it names is in the pantry. Dhaniya is in the recipe but not the pantry, and the sentence doesn't claim it, though the cook-now state ignores it."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "veg-pulao",
+      "state": "cook-now",
+      "sentence": "You can cook this now with your rice, onion and garam masala, and adding potato makes it filling enough for four in about 30 minutes.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'You can cook this now' implies they have everything, but the recipe's Green peas and Capsicum aren't in the pantry (the cook-now state is inconsistent)."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "It takes 20 minutes from what you already have, and it can share your second burner with a curry.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'With a curry' is about sharing a burner or serving alongside, not an ingredient. All the ingredients are in the pantry."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "It's the closest thing here to the meaty dinner you wanted and takes 12 minutes, but the kitchen check lists Egg as missing.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Meaty dinner' refers to what the user wanted and doesn't say the dish has meat. Egg is correctly called missing, though the data also lists Egg in the pantry."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "A comforting 25-minute dal that only needs Tomato.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only needs Tomato' implies they have Garlic and Dhaniya, which aren't in the pantry."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "A spiced everyday sabzi in 25 minutes that only needs Bhindi.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "'Only needs Bhindi' implies they have Tomato, which isn't in the pantry."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "Quick and light at 15 minutes, but it needs Besan.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "No 'only'. It names Besan as needed. Tomato and Green chilli are also absent, but the sentence doesn't claim them."
+    },
+    {
+      "pantry": "n-r08",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "A light 15-minute option that needs Poha.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "No 'only'. It names Poha as needed. Green chilli, Curry leaves and Lemon are also absent, but the sentence doesn't claim them."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "The quickest option at 12 minutes and low effort, it needs egg and onion.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Egg and onion named only as needed items."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "besan-chilla",
+      "state": "need-items",
+      "sentence": "A light 15-minute dinner that uses your oil and salt and can take your onion as an optional extra, it needs besan and haldi.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Oil, salt and onion are all in pantry and recipe; besan and haldi named as needed."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "jeera-rice",
+      "state": "need-items",
+      "sentence": "A simple 20-minute everyday dish, it needs rice, jeera and ghee.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "A wholesome dish for four that can take your onion as an optional extra, it needs potato, cauliflower and haldi.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Onion is in pantry and recipe, so 'your onion' is fine."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "bhindi-masala",
+      "state": "need-items",
+      "sentence": "A 25-minute everyday sabzi, it needs bhindi, onion and haldi.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "veg-pulao",
+      "state": "need-items",
+      "sentence": "A one-pot meal that works well on two burners, it needs rice, onion and garam masala.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Two burners' is equipment, not an ingredient."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "kanda-poha",
+      "state": "need-items",
+      "sentence": "A light 15-minute dish that can be finished with your lemon, it needs poha, onion, rai and haldi.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Lemon is in pantry and recipe, so 'your lemon' is fine."
+    },
+    {
+      "pantry": "n-r09",
+      "recipeId": "dal-tadka",
+      "state": "need-items",
+      "sentence": "Comforting and easy once you shop, it needs toor dal, tomato, haldi, jeera and ghee.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "jeera-rice",
+      "state": "cook-now",
+      "sentence": "Ready to cook right now with nothing to check, and it takes 20 minutes, so it's a simple side next to one of the vegetable dishes.",
+      "index": 0,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "'Side next to one of the vegetable dishes' is a pairing, not an ingredient claim."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "palak-paneer",
+      "state": "check-first",
+      "sentence": "Uses up the most produce in one pot, with palak, onion, tomato and paneer, so check that they're all still good before you start.",
+      "index": 1,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "Says you only need to check the produce before starting, which implies they have Ginger and Green chilli. Neither is in the pantry, and the missing list leaves them out."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "bhindi-masala",
+      "state": "check-first",
+      "sentence": "A good way to use the bhindi before it turns soft and slimy, so just make sure it and the onion are still fresh.",
+      "index": 2,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "dal-tadka",
+      "state": "check-first",
+      "sentence": "Comforting and done in 25 minutes, and it uses up a tomato, so check it's still usable first.",
+      "index": 3,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": ""
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "veg-pulao",
+      "state": "check-first",
+      "sentence": "A one-pot dinner in 30 minutes that uses up an onion, once you've checked it's still good.",
+      "index": 4,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "Says the dish is ready once the onion is checked, which implies they have Green peas, Potato and Capsicum. None are in the pantry, and the missing list leaves them out."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "egg-bhurji",
+      "state": "need-items",
+      "sentence": "The fastest dish here at 12 minutes, but you'd need to buy eggs.",
+      "index": 5,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "Naming eggs to buy is fine, but listing only eggs implies they have Green chilli, which isn't in the pantry."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "matar-paneer",
+      "state": "need-items",
+      "sentence": "Good for a richer meal, but you'd need to buy green peas and ginger.",
+      "index": 6,
+      "saysTheyHaveSomethingTheyLack": true,
+      "namesIngredientNotInDish": false,
+      "note": "Naming peas and ginger to buy is fine, but listing only those implies they have Kasuri methi, which isn't in the pantry."
+    },
+    {
+      "pantry": "n-r10",
+      "recipeId": "aloo-gobi",
+      "state": "need-items",
+      "sentence": "Filling and wholesome, but you'd need to buy potato and cauliflower.",
+      "index": 7,
+      "saysTheyHaveSomethingTheyLack": false,
+      "namesIngredientNotInDish": false,
+      "note": "Naming potato and cauliflower to buy is fine. All other ingredients are in the pantry."
+    }
+  ],
+  "calls": [
+    {
+      "label": "review-n-r02",
+      "ms": 11057,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":true,\"namesIngredientNotInDish\":false,\"note\":\"'With what's already in the kitchen' implies they have everything, but the recipe needs green chilli, which is not in the pantry.\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":true,\"namesIngredientNo",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1101,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2074,
+        "thinking_tokens": 496
+      },
+      "cost_usd_list": 0.0388222,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r01",
+      "ms": 11863,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"The recipe uses garlic, which isn't in the pantry, but the sentence doesn't mention it or say they have ",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1126,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2108,
+        "thinking_tokens": 375
+      },
+      "cost_usd_list": 0.0395942,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r03",
+      "ms": 12675,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":true,\"namesIngredientNotInDish\":false,\"note\":\"'You already have everything' implies they have Dhaniya, which is in the recipe but not in the pantry.\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"'Go",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1314,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2117,
+        "thinking_tokens": 602
+      },
+      "cost_usd_list": 0.0434262,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r05",
+      "ms": 8943,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":2,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"Garlic and ",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 932,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2104,
+        "thinking_tokens": 307
+      },
+      "cost_usd_list": 0.0356822,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r06",
+      "ms": 12484,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"Rajma is mentioned only as the dish this replaces, and 'go with rice' is a pairing. Neither is an ingred",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1307,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2106,
+        "thinking_tokens": 612
+      },
+      "cost_usd_list": 0.0431982,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r04",
+      "ms": 14376,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":true,\"namesIngredientNotInDish\":false,\"note\":\"\\\"You have everything for it\\\" is wrong: the recipe also needs onion, garlic and dhaniya, which aren't in the pantry.\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":fa",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1512,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2093,
+        "thinking_tokens": 633
+      },
+      "cost_usd_list": 0.047194200000000006,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r07",
+      "ms": 12847,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":true,\"namesIngredientNotInDish\":false,\"note\":\"'You can cook this right now' implies they have Potato and Capsicum, which the recipe needs but the pantry lacks. 'Alongside a curry' is a pairing, not an ingredient.\"},{\"index\":1,\"saysTheyHaveSomet",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1298,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2154,
+        "thinking_tokens": 627
+      },
+      "cost_usd_list": 0.0434022,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r09",
+      "ms": 10646,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"Egg and onion named only as needed items.\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"Oil, salt and onion are all in pantry and recipe; besan and hal",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1008,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2180,
+        "thinking_tokens": 276
+      },
+      "cost_usd_list": 0.0378102,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r08",
+      "ms": 21252,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"Chicken and fish are only mentioned as not being in the kitchen. Every ingredient it names is in the pantry. Dhaniya is in the recipe but not the pantry, and the sentence doesn't claim it, though t",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 2123,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2123,
+        "thinking_tokens": 1110
+      },
+      "cost_usd_list": 0.0596542,
+      "num_turns": 2
+    },
+    {
+      "label": "review-n-r10",
+      "ms": 18625,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"saysTheyHaveSomethingTheyLack\":false,\"namesIngredientNotInDish\":false,\"note\":\"'Side next to one of the vegetable dishes' is a pairing, not an ingredient claim.\"},{\"index\":1,\"saysTheyHaveSomethingTheyLack\":true,\"namesIngredientNotInDish\":false,\"note\":\"Says you only need to ch",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1830,
+        "cache_read_input_tokens": 1011,
+        "cache_creation_input_tokens": 2175,
+        "thinking_tokens": 978
+      },
+      "cost_usd_list": 0.0542102,
+      "num_turns": 2
+    }
+  ]
+}
