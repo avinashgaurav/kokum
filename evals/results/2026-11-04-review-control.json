@@ -1,0 +1,1009 @@
+{
+  "summary": {
+    "reviewer": "AI reviewer (claude-opus-5-5), instructions v2",
+    "runs": [
+      {
+        "run": 1,
+        "badCaught": 10,
+        "badCaughtAnyField": 10,
+        "bad": 10,
+        "goodFalseAlarms": 0,
+        "good": 10,
+        "byCategory": {
+          "claimsItemTheyLack": "3 / 3",
+          "contradictsStateOrMissing": "2 / 2",
+          "namesIngredientNotInDish": "5 / 5"
+        }
+      },
+      {
+        "run": 2,
+        "badCaught": 10,
+        "badCaughtAnyField": 10,
+        "bad": 10,
+        "goodFalseAlarms": 0,
+        "good": 10,
+        "byCategory": {
+          "claimsItemTheyLack": "3 / 3",
+          "contradictsStateOrMissing": "2 / 2",
+          "namesIngredientNotInDish": "5 / 5"
+        }
+      },
+      {
+        "run": 3,
+        "badCaught": 10,
+        "badCaughtAnyField": 10,
+        "bad": 10,
+        "goodFalseAlarms": 0,
+        "good": 10,
+        "byCategory": {
+          "claimsItemTheyLack": "3 / 3",
+          "contradictsStateOrMissing": "2 / 2",
+          "namesIngredientNotInDish": "5 / 5"
+        }
+      }
+    ],
+    "calls": 6,
+    "costUsdCliReported": 0.1759
+  },
+  "runs": [
+    {
+      "run": 1,
+      "badCaught": 10,
+      "badCaughtAnyField": 10,
+      "bad": 10,
+      "goodFalseAlarms": 0,
+      "good": 10,
+      "byCategory": {
+        "claimsItemTheyLack": "3 / 3",
+        "contradictsStateOrMissing": "2 / 2",
+        "namesIngredientNotInDish": "5 / 5"
+      },
+      "misses": [],
+      "falseAlarms": [],
+      "verdicts": [
+        {
+          "group": "ctl-a",
+          "recipeId": "dal-tadka",
+          "sentence": "An easy 25-minute dal with your toor dal and tomato and a ghee-jeera tadka.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "palak-paneer",
+          "sentence": "You already have the paneer and palak, so this is a rich 30-minute dinner.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Claims they already have paneer, which is not in the pantry and is on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "jeera-rice",
+          "sentence": "Rice cooked in ghee with jeera and sliced onion, ready in 20 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Onion is not a core or optional ingredient of jeera rice.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "egg-bhurji",
+          "sentence": "The fastest dish at 12 minutes, once you buy eggs.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "dal-tadka",
+          "sentence": "A 25-minute dal with toor dal, tomato and a handful of your palak stirred in.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Palak is not a core or optional ingredient of dal tadka.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "jeera-rice",
+          "sentence": "Ready in 20 minutes with just rice, jeera and ghee, and it goes well with the dal.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "'Goes well with the dal' is a pairing, not an ingredient claim.",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "matar-paneer",
+          "sentence": "Uses the frozen peas you have, and you just need paneer.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Claims they have peas, which are not in the pantry and are on the missing list along with paneer.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "palak-paneer",
+          "sentence": "Your palak needs using up, and you only need to buy paneer.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "egg-bhurji",
+          "sentence": "It says you need eggs, but you probably have some, so go ahead and start.",
+          "expect": "bad",
+          "catch": "contradictsStateOrMissing",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Implies they have eggs, which are not in the pantry, and disputes the app's missing list and need-items state.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "veg-pulao",
+          "sentence": "A one-pot rice with onion and garam masala that you can make now in 30 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "veg-pulao",
+          "sentence": "A one-pot pulao with rice, onion and tomato, ready in 30 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Tomato is not a core or optional ingredient of veg pulao.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "kanda-poha",
+          "sentence": "A light 15-minute dish with your onion, once you buy poha.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "Poha is correctly named as the item to buy.",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "aloo-gobi",
+          "sentence": "Uses your cauliflower before it turns, with potato and haldi, in 30 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "egg-bhurji",
+          "sentence": "Egg is listed as missing, but your pantry shows eggs, so you can probably make it now.",
+          "expect": "bad",
+          "catch": "contradictsStateOrMissing",
+          "flagged": [
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says Egg is not really missing and the dish can be made now, which contradicts the need-items state. Egg is on the pantry list, but there isn't enough of it.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "kadhi",
+          "sentence": "Light and soothing, with your curd and besan and a rai tadka, in 35 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "dal-tadka",
+          "sentence": "Use your tomatoes and buy toor dal for a comforting 25-minute dal.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "'Use your tomatoes' implies they have tomato, but it isn't on the pantry list and it's on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "egg-bhurji",
+          "sentence": "Quick at 12 minutes, but you need more eggs first.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "kadhi",
+          "sentence": "A light kadhi with curd, besan and a little potato for body, ready in 35 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Says the kadhi contains potato, which is in neither its core nor its optional list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "dal-tadka",
+          "sentence": "A comforting dal, once you buy toor dal and tomato.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "besan-chilla",
+          "sentence": "Besan pancakes with grated cauliflower and onion, ready in 15 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Says the chilla is made with grated cauliflower, which is in neither its core nor its optional list. Onion is optional, so that part is fine.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "badCaught": 10,
+      "badCaughtAnyField": 10,
+      "bad": 10,
+      "goodFalseAlarms": 0,
+      "good": 10,
+      "byCategory": {
+        "claimsItemTheyLack": "3 / 3",
+        "contradictsStateOrMissing": "2 / 2",
+        "namesIngredientNotInDish": "5 / 5"
+      },
+      "misses": [],
+      "falseAlarms": [],
+      "verdicts": [
+        {
+          "group": "ctl-a",
+          "recipeId": "dal-tadka",
+          "sentence": "An easy 25-minute dal with your toor dal and tomato and a ghee-jeera tadka.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "palak-paneer",
+          "sentence": "You already have the paneer and palak, so this is a rich 30-minute dinner.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says they already have paneer, but paneer isn't in the pantry and it's on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "jeera-rice",
+          "sentence": "Rice cooked in ghee with jeera and sliced onion, ready in 20 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Onion isn't in jeera rice's core or optional list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "egg-bhurji",
+          "sentence": "The fastest dish at 12 minutes, once you buy eggs.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "dal-tadka",
+          "sentence": "A 25-minute dal with toor dal, tomato and a handful of your palak stirred in.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Palak isn't in dal tadka's core or optional list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "jeera-rice",
+          "sentence": "Ready in 20 minutes with just rice, jeera and ghee, and it goes well with the dal.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "Dal is mentioned as a pairing, not as an ingredient: fine.",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "matar-paneer",
+          "sentence": "Uses the frozen peas you have, and you just need paneer.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says they have peas, but green peas aren't in the pantry and are on the missing list; also says only paneer is needed.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "palak-paneer",
+          "sentence": "Your palak needs using up, and you only need to buy paneer.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "egg-bhurji",
+          "sentence": "It says you need eggs, but you probably have some, so go ahead and start.",
+          "expect": "bad",
+          "catch": "contradictsStateOrMissing",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Suggests they have eggs, which aren't in the pantry, and says to ignore the app's need-items state.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "veg-pulao",
+          "sentence": "A one-pot rice with onion and garam masala that you can make now in 30 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "veg-pulao",
+          "sentence": "A one-pot pulao with rice, onion and tomato, ready in 30 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Tomato isn't in veg pulao's core or optional list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "kanda-poha",
+          "sentence": "A light 15-minute dish with your onion, once you buy poha.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "aloo-gobi",
+          "sentence": "Uses your cauliflower before it turns, with potato and haldi, in 30 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "egg-bhurji",
+          "sentence": "Egg is listed as missing, but your pantry shows eggs, so you can probably make it now.",
+          "expect": "bad",
+          "catch": "contradictsStateOrMissing",
+          "flagged": [
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says Egg isn't really missing and that the dish can probably be made now, which disputes the app's need-items state.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "kadhi",
+          "sentence": "Light and soothing, with your curd and besan and a rai tadka, in 35 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "dal-tadka",
+          "sentence": "Use your tomatoes and buy toor dal for a comforting 25-minute dal.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says 'use your tomatoes', but Tomato isn't in the pantry and is on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "egg-bhurji",
+          "sentence": "Quick at 12 minutes, but you need more eggs first.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "kadhi",
+          "sentence": "A light kadhi with curd, besan and a little potato for body, ready in 35 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Potato isn't a core or optional ingredient of Kadhi.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "dal-tadka",
+          "sentence": "A comforting dal, once you buy toor dal and tomato.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "besan-chilla",
+          "sentence": "Besan pancakes with grated cauliflower and onion, ready in 15 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Cauliflower isn't a core or optional ingredient of Besan chilla. Onion is optional, so it's fine.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "badCaught": 10,
+      "badCaughtAnyField": 10,
+      "bad": 10,
+      "goodFalseAlarms": 0,
+      "good": 10,
+      "byCategory": {
+        "claimsItemTheyLack": "3 / 3",
+        "contradictsStateOrMissing": "2 / 2",
+        "namesIngredientNotInDish": "5 / 5"
+      },
+      "misses": [],
+      "falseAlarms": [],
+      "verdicts": [
+        {
+          "group": "ctl-a",
+          "recipeId": "dal-tadka",
+          "sentence": "An easy 25-minute dal with your toor dal and tomato and a ghee-jeera tadka.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "palak-paneer",
+          "sentence": "You already have the paneer and palak, so this is a rich 30-minute dinner.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says they already have paneer, but paneer isn't in the pantry and is on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "jeera-rice",
+          "sentence": "Rice cooked in ghee with jeera and sliced onion, ready in 20 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Onion is in neither the core nor the optional list for jeera rice.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "egg-bhurji",
+          "sentence": "The fastest dish at 12 minutes, once you buy eggs.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "dal-tadka",
+          "sentence": "A 25-minute dal with toor dal, tomato and a handful of your palak stirred in.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Palak is in neither the core nor the optional list for dal tadka.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "jeera-rice",
+          "sentence": "Ready in 20 minutes with just rice, jeera and ghee, and it goes well with the dal.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "Dal is named as a pairing, not as an ingredient, so this is fine.",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "matar-paneer",
+          "sentence": "Uses the frozen peas you have, and you just need paneer.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says they have peas, but green peas aren't in the pantry and are on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "palak-paneer",
+          "sentence": "Your palak needs using up, and you only need to buy paneer.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "egg-bhurji",
+          "sentence": "It says you need eggs, but you probably have some, so go ahead and start.",
+          "expect": "bad",
+          "catch": "contradictsStateOrMissing",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says they probably have eggs and should start, but eggs aren't in the pantry and are missing, so the app's state is contradicted.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "veg-pulao",
+          "sentence": "A one-pot rice with onion and garam masala that you can make now in 30 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "veg-pulao",
+          "sentence": "A one-pot pulao with rice, onion and tomato, ready in 30 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Tomato is in neither the core nor the optional list for veg pulao.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-a",
+          "recipeId": "kanda-poha",
+          "sentence": "A light 15-minute dish with your onion, once you buy poha.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "aloo-gobi",
+          "sentence": "Uses your cauliflower before it turns, with potato and haldi, in 30 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "egg-bhurji",
+          "sentence": "Egg is listed as missing, but your pantry shows eggs, so you can probably make it now.",
+          "expect": "bad",
+          "catch": "contradictsStateOrMissing",
+          "flagged": [
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says Egg is not really missing and the dish can be made now, which contradicts the need-items state (they have some egg, just not enough).",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "kadhi",
+          "sentence": "Light and soothing, with your curd and besan and a rai tadka, in 35 minutes.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "dal-tadka",
+          "sentence": "Use your tomatoes and buy toor dal for a comforting 25-minute dal.",
+          "expect": "bad",
+          "catch": "claimsItemTheyLack",
+          "flagged": [
+            "claimsItemTheyLack",
+            "contradictsStateOrMissing"
+          ],
+          "note": "Says they have tomatoes, but Tomato is not in the pantry and is on the missing list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "egg-bhurji",
+          "sentence": "Quick at 12 minutes, but you need more eggs first.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "kadhi",
+          "sentence": "A light kadhi with curd, besan and a little potato for body, ready in 35 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Says the kadhi contains potato, which is not in its core or optional list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "dal-tadka",
+          "sentence": "A comforting dal, once you buy toor dal and tomato.",
+          "expect": "good",
+          "catch": null,
+          "flagged": [],
+          "note": "",
+          "caught": null,
+          "caughtAnyField": null,
+          "falseAlarm": false
+        },
+        {
+          "group": "ctl-b",
+          "recipeId": "besan-chilla",
+          "sentence": "Besan pancakes with grated cauliflower and onion, ready in 15 minutes.",
+          "expect": "bad",
+          "catch": "namesIngredientNotInDish",
+          "flagged": [
+            "namesIngredientNotInDish"
+          ],
+          "note": "Says the chilla contains grated cauliflower, which is not in its core or optional list.",
+          "caught": true,
+          "caughtAnyField": true,
+          "falseAlarm": null
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "label": "control-ctl-a-run1",
+      "ms": 13805,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":true,\"contradictsStateOrMissing\":true,\"namesIngredientNotInDish\":false,\"note\":\"Claims they already have paneer, which is not in the pantry ",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1547,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2942,
+        "thinking_tokens": 325
+      },
+      "cost_usd_list": 0.0547334,
+      "num_turns": 2
+    },
+    {
+      "label": "control-ctl-b-run1",
+      "ms": 8674,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":true,\"namesIngredientNotInDish\":false,\"note\":\"Says Egg is not really missing and the dish can be made now",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 841,
+        "cache_read_input_tokens": 1247,
+        "cache_creation_input_tokens": 2185,
+        "thinking_tokens": 185
+      },
+      "cost_usd_list": 0.0345574,
+      "num_turns": 2
+    },
+    {
+      "label": "control-ctl-a-run2",
+      "ms": 13416,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":true,\"contradictsStateOrMissing\":true,\"namesIngredientNotInDish\":false,\"note\":\"Says they already have paneer, but paneer isn't in the pantr",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1351,
+        "cache_read_input_tokens": 4189,
+        "cache_creation_input_tokens": 0,
+        "thinking_tokens": 278
+      },
+      "cost_usd_list": 0.0278658,
+      "num_turns": 2
+    },
+    {
+      "label": "control-ctl-b-run2",
+      "ms": 7909,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":true,\"namesIngredientNotInDish\":false,\"note\":\"Says Egg isn't really missing and that the dish can probabl",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 802,
+        "cache_read_input_tokens": 3432,
+        "cache_creation_input_tokens": 0,
+        "thinking_tokens": 177
+      },
+      "cost_usd_list": 0.0167344,
+      "num_turns": 2
+    },
+    {
+      "label": "control-ctl-a-run3",
+      "ms": 11212,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":true,\"contradictsStateOrMissing\":true,\"namesIngredientNotInDish\":false,\"note\":\"Says they already have paneer, but paneer isn't in the pantr",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 1215,
+        "cache_read_input_tokens": 4189,
+        "cache_creation_input_tokens": 0,
+        "thinking_tokens": 310
+      },
+      "cost_usd_list": 0.0251458,
+      "num_turns": 2
+    },
+    {
+      "label": "control-ctl-b-run3",
+      "ms": 8138,
+      "exit": 0,
+      "is_error": false,
+      "result_head": "{\"verdicts\":[{\"index\":0,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":false,\"namesIngredientNotInDish\":false,\"note\":\"\"},{\"index\":1,\"claimsItemTheyLack\":false,\"contradictsStateOrMissing\":true,\"namesIngredientNotInDish\":false,\"note\":\"Says Egg is not really missing and the dish can be made now",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 808,
+        "cache_read_input_tokens": 3432,
+        "cache_creation_input_tokens": 0,
+        "thinking_tokens": 190
+      },
+      "cost_usd_list": 0.016854400000000002,
+      "num_turns": 2
+    }
+  ]
+}
