@@ -68,31 +68,42 @@ export function callClaude({ model, system, messages, schema, label = '' }) {
   }
   const t0 = Date.now();
   return new Promise((resolve) => {
-    const p = spawn(claudeBin(), args, { cwd: CWD, env: { ...process.env, CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1' } });
     let out = '';
     let err = '';
     let timedOut = false;
     let settled = false;
-    const timer = setTimeout(() => { timedOut = true; p.kill('SIGKILL'); }, TIMEOUT_MS);
-    p.stdout.on('data', (d) => (out += d));
-    p.stderr.on('data', (d) => (err += d));
-    // A missing binary also fails the stdin write; the 'error' handler below reports it.
-    p.stdin.on('error', () => {});
-    p.stdin.end(stdin);
-    // Without this, a spawn failure (for example no `claude` on PATH) waits out the full timeout.
-    p.on('error', (e) => {
+    let timer;
+    // One failure path for both ways the CLI can fail to start: spawn() throwing at once
+    // (for example a NUL byte in an argument) and the async 'error' event (for example no
+    // `claude` on PATH). Without it, the second case waits out the full timeout.
+    const fail = (e) => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
       const ms = Date.now() - t0;
       const rec = {
         label, ms, exit: null, is_error: true,
-        result_head: `could not run the claude CLI: ${e.message}`.slice(0, 300),
+        result_head: `could not run the claude CLI: ${e?.message ?? e}`.slice(0, 300),
         models: [], usage: null, cost_usd_list: null, num_turns: undefined,
       };
       CALL_LOG.push(rec);
       resolve({ ok: false, structured: null, text: '', envelope: null, ms, rec, limitHit: false });
-    });
+    };
+    let p;
+    try {
+      p = spawn(claudeBin(), args, { cwd: CWD, env: { ...process.env, CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1' } });
+    } catch (e) {
+      fail(e);
+      return;
+    }
+    timer = setTimeout(() => { timedOut = true; p.kill('SIGKILL'); }, TIMEOUT_MS);
+    p.on('error', fail);
+    p.stdout.on('data', (d) => (out += d));
+    p.stderr.on('data', (d) => (err += d));
+    // A process that exits early (or never started) makes the stdin write fail with EPIPE.
+    // The outcome is reported by 'close' or 'error', so this error needs no handling of its own.
+    p.stdin.on('error', () => {});
+    p.stdin.end(stdin);
     p.on('close', (code) => {
       if (settled) return;
       settled = true;
