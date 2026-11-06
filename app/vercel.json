@@ -6,7 +6,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!_expo/static/).*)",
+      "source": "/((?!_expo/static/|_vercel/).*)",
       "destination": "/index.html"
     }
   ],
